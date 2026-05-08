@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono, Calistoga } from "next/font/google";
 import { ClientPrivyProvider } from "@/components/providers/ClientPrivyProvider";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
+const calistoga = Calistoga({ subsets: ["latin"], weight: ["400"], variable: "--font-calistoga" });
 
 export const metadata: Metadata = {
   title: "VoiceFi · Voice-first money",
@@ -19,7 +20,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${geistMono.variable} ${calistoga.variable}`}>
       <body>
         <ClientPrivyProvider>{children}</ClientPrivyProvider>
       </body>

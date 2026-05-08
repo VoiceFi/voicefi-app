@@ -36,7 +36,7 @@ export function Sidebar() {
       aria-label="Primary navigation"
       className="hidden md:flex w-[260px] shrink-0 border-r border-[var(--border)] bg-[var(--card)] p-7 px-5 flex-col gap-1 sticky top-0 h-screen"
     >
-      <div className="flex items-center gap-3 px-2 pb-7 pt-1 font-bold text-[19px] tracking-tight">
+      <div className="flex items-center gap-3 px-2 pb-7 pt-1 font-display font-normal text-[19px] tracking-[0.12em]">
         <BrandMark />
         <span>VoiceFi</span>
       </div>
