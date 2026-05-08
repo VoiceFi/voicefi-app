@@ -5,3 +5,13 @@ export interface PendingTransaction {
   recipient: string;
   note?: string;
 }
+
+export type IntentType = "send" | "balance" | "swap";
+
+export interface DetectedIntent {
+  intent: IntentType;
+  amount?: number;
+  token?: string;
+  recipient?: string;
+  timestamp: number;
+}
