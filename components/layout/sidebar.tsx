@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Users, Mic, Shield, LogOut } from "lucide-react";
+import { Home, Users, Settings, LogOut } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { cn } from "@/lib/utils";
@@ -10,8 +10,7 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Home", Icon: Home },
   { to: "/dashboard/contacts", label: "Contacts", Icon: Users },
-  { to: "/dashboard/voice-settings", label: "Voice", Icon: Mic },
-  { to: "/dashboard/security", label: "Security", Icon: Shield },
+  { to: "/dashboard/settings", label: "Settings", Icon: Settings },
 ] as const;
 
 function getInitials(email: string | null | undefined): string {

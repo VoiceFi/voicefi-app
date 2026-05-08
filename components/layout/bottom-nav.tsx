@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Users, Mic, Shield } from "lucide-react";
+import { Home, Users, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { to: "/dashboard", label: "Home", Icon: Home },
   { to: "/dashboard/contacts", label: "Contacts", Icon: Users },
-  { to: "/dashboard/voice-settings", label: "Voice", Icon: Mic },
-  { to: "/dashboard/security", label: "Security", Icon: Shield },
+  { to: "/dashboard", label: "Home", Icon: Home },
+  { to: "/dashboard/settings", label: "Settings", Icon: Settings },
 ] as const;
 
 export function BottomNav() {

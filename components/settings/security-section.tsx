@@ -7,22 +7,22 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { mockSessions } from "@/lib/mock-data";
 
-export default function SecurityPage() {
+export function SecuritySection() {
   const [limit, setLimit] = useState(150);
   const [extraConfirm, setExtraConfirm] = useState(true);
 
   return (
-    <div className="max-w-[720px] mx-auto px-5 md:px-8 py-8 w-full" data-screen-label="Security">
-      <header className="mb-7">
-        <h2 className="text-[30px] font-bold tracking-tight m-0">Security</h2>
-        <p className="text-[var(--muted-foreground)] mt-1.5 text-[15px]">
+    <section className="space-y-5">
+      <div>
+        <h3 className="text-lg font-semibold m-0">Security</h3>
+        <p className="text-[var(--muted-foreground)] text-sm mt-1">
           Keep your account safe with simple controls.
         </p>
-      </header>
+      </div>
 
-      <Card className="mb-4">
+      <Card>
         <div className="flex justify-between items-baseline mb-1">
-          <h3 className="text-lg font-semibold m-0">Daily limit</h3>
+          <h4 className="text-base font-semibold m-0">Daily limit</h4>
           <div className="text-[22px] font-bold tracking-tight">${limit}</div>
         </div>
         <p className="text-[var(--muted-foreground)] text-sm mb-4 mt-0">
@@ -42,9 +42,9 @@ export default function SecurityPage() {
         </div>
       </Card>
 
-      <Card className="mb-4 flex gap-4 items-start">
+      <Card className="flex gap-4 items-start">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold m-0 mb-1">Extra confirmation</h3>
+          <h4 className="text-base font-semibold m-0 mb-1">Extra confirmation</h4>
           <p className="text-[var(--muted-foreground)] text-sm m-0">
             Require an additional confirmation for transactions above $50.
           </p>
@@ -57,7 +57,7 @@ export default function SecurityPage() {
       </Card>
 
       <Card>
-        <h3 className="text-lg font-semibold m-0 mb-1">Recent sign-ins</h3>
+        <h4 className="text-base font-semibold m-0 mb-1">Recent sign-ins</h4>
         <p className="text-[var(--muted-foreground)] text-sm mb-4 mt-0">
           Activity from the last 30 days.
         </p>
@@ -93,6 +93,6 @@ export default function SecurityPage() {
           ))}
         </div>
       </Card>
-    </div>
+    </section>
   );
 }
