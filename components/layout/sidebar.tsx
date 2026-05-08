@@ -13,8 +13,9 @@ const NAV_ITEMS = [
   { to: "/dashboard/security", label: "Security", Icon: Shield },
 ] as const;
 
-export function Sidebar() {
+export function Sidebar({ email, initial }: { email: string; initial: string }) {
   const pathname = usePathname();
+  const displayName = email.split("@")[0] || "Account";
   return (
     <aside
       aria-label="Primary navigation"
@@ -51,11 +52,11 @@ export function Sidebar() {
           className="w-[38px] h-[38px] rounded-full grid place-items-center text-white font-semibold text-sm"
           style={{ background: "linear-gradient(135deg, #4A90D9, #34C9A0)" }}
         >
-          EL
+          {initial}
         </span>
         <div className="min-w-0">
-          <div className="font-semibold text-sm leading-tight">Elena Ruiz</div>
-          <div className="text-xs text-[var(--muted-foreground)] leading-tight mt-0.5">elena@email.com</div>
+          <div className="font-semibold text-sm leading-tight truncate">{displayName}</div>
+          <div className="text-xs text-[var(--muted-foreground)] leading-tight mt-0.5 truncate">{email}</div>
         </div>
       </div>
     </aside>

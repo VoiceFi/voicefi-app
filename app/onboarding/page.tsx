@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowRight, Check, Copy, Mic } from "lucide-react";
+import { ArrowRight, Check, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { BrandMark } from "@/components/brand/brand-mark";
-import { truncateAddress } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 function GoogleIcon({ size = 20 }: { size?: number }) {
   return (
@@ -20,25 +19,36 @@ function GoogleIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-const MOCK_WALLET = "7xKp9zM4nVc8aBn5fT2wX9pQrL3yJk1mN8cR2dV4";
-
 export default function OnboardingPage() {
-  const router = useRouter();
-  const [step, setStep] = useState<1 | 2>(1);
+  const supabase = createClient();
   const [email, setEmail] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // TODO: Privy wallet integration here — replace local step transitions with
-  // `usePrivy()` / `useLogin()` and read the embedded Solana wallet from `useWallets()`.
-  const handleEmailContinue = () => setStep(2);
-  const handleGoogle = () => setStep(2);
+  const handleEmailContinue = async () => {
+    if (!email.includes("@")) return;
+    setSubmitting(true);
+    setError(null);
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${location.origin}/auth/callback` },
+    });
+    setSubmitting(false);
+    if (error) {
+      setError(error.message);
+      return;
+    }
+    setSent(true);
+  };
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard?.writeText(MOCK_WALLET);
-    } catch {}
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
+  const handleGoogle = async () => {
+    setError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${location.origin}/auth/callback` },
+    });
+    if (error) setError(error.message);
   };
 
   return (
@@ -51,14 +61,14 @@ export default function OnboardingPage() {
       <div className="h-1.5 bg-[var(--muted)] rounded-full max-w-[480px] w-full mx-auto overflow-hidden">
         <div
           className="h-full bg-[var(--primary)] rounded-full transition-[width] duration-400"
-          style={{ width: `${step * 50}%` }}
+          style={{ width: sent ? "100%" : "50%" }}
         />
       </div>
       <div className="text-center text-[var(--muted-foreground)] text-sm font-medium mt-3 mb-14">
-        Step {step} of 2
+        {sent ? "Check your email" : "Sign in"}
       </div>
 
-      {step === 1 && (
+      {!sent && (
         <div className="max-w-[480px] w-full mx-auto bg-[var(--card)] border border-[var(--border)] rounded-[28px] p-9 px-9 animate-fade-in-up">
           <h2 className="text-[30px] font-bold tracking-tight mb-3">Welcome</h2>
           <p className="text-[var(--muted-foreground)] mb-7 text-base">
@@ -89,10 +99,14 @@ export default function OnboardingPage() {
           <Button
             className="w-full mt-4"
             onClick={handleEmailContinue}
-            disabled={email !== "" && !email.includes("@")}
+            disabled={submitting || !email.includes("@")}
           >
-            Continue <ArrowRight size={18} />
+            {submitting ? "Sending…" : "Continue"} <ArrowRight size={18} />
           </Button>
+
+          {error && (
+            <p className="text-sm text-[var(--destructive)] mt-4 text-center">{error}</p>
+          )}
 
           <p className="text-[var(--muted-foreground)] text-[13px] text-center mt-6 leading-normal">
             By continuing, you agree to our Terms and Privacy Policy.
@@ -100,43 +114,23 @@ export default function OnboardingPage() {
         </div>
       )}
 
-      {step === 2 && (
+      {sent && (
         <div className="max-w-[480px] w-full mx-auto bg-[var(--card)] border border-[var(--border)] rounded-[28px] p-9 animate-fade-in-up">
           <div
             className="w-16 h-16 rounded-[22px] grid place-items-center mx-auto mb-5"
             style={{ background: "rgba(52,201,160,0.15)", color: "var(--secondary)" }}
           >
-            <Check size={32} />
+            <Mail size={32} />
           </div>
-          <h2 className="text-[30px] font-bold tracking-tight mb-3 text-center">You’re all set</h2>
+          <h2 className="text-[30px] font-bold tracking-tight mb-3 text-center">Check your inbox</h2>
           <p className="text-[var(--muted-foreground)] mb-7 text-base text-center">
-            Your secure account is ready. Tap the microphone on the next screen and say something like “check my
-            balance.”
+            We sent a sign-in link to <span className="font-semibold text-[var(--foreground)]">{email}</span>. Open it
+            on this device to finish signing in.
           </p>
-
-          <div className="bg-[var(--input)] rounded-2xl py-3.5 px-4.5 px-[18px] flex items-center gap-3">
-            <div className="min-w-0 flex-1">
-              <div className="text-[var(--muted-foreground)] text-xs font-medium mb-0.5">Account ID</div>
-              <div className="mono text-sm font-medium overflow-hidden whitespace-nowrap text-ellipsis">
-                {truncateAddress(MOCK_WALLET)}
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleCopy}
-              aria-label="Copy account ID"
-              className="px-3 py-2.5"
-            >
-              {copied ? <Check size={18} /> : <Copy size={18} />}
-            </Button>
-          </div>
-
           <ul className="list-none p-0 my-6 flex flex-col gap-3">
             {[
-              "Speak naturally — “send 20 dollars to James”",
-              "Press and hold to confirm any payment",
-              "Say “cancel” any time to stop",
+              "The link expires in 1 hour",
+              "Didn’t get it? Check spam, then try again",
             ].map((t, i) => (
               <li key={i} className="flex items-start gap-3 text-[15px]">
                 <span className="w-[22px] h-[22px] rounded-full bg-[var(--accent)] text-[var(--primary)] grid place-items-center shrink-0 mt-0.5">
@@ -146,9 +140,15 @@ export default function OnboardingPage() {
               </li>
             ))}
           </ul>
-
-          <Button className="w-full" onClick={() => router.push("/dashboard")}>
-            Start talking <Mic size={18} />
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => {
+              setSent(false);
+              setEmail("");
+            }}
+          >
+            Use a different email
           </Button>
         </div>
       )}

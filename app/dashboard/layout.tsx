@@ -1,14 +1,29 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Topbar } from "@/components/layout/topbar";
+import { createClient } from "@/lib/supabase/server";
 
-// NOTE: For per-route titles you can introspect usePathname in a client component.
-// Here we use a single "Home" topbar; pages may render their own headers as needed.
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+function initialsFor(email: string | undefined): string {
+  if (!email) return "?";
+  return email[0]?.toUpperCase() ?? "?";
+}
+
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/onboarding");
+
+  const email = user.email ?? "";
+  const initial = initialsFor(email);
+
   return (
     <div className="min-h-screen flex bg-[var(--background)]">
-      <Sidebar />
+      <Sidebar email={email} initial={initial} />
       <div className="flex-1 min-w-0 flex flex-col">
         <Topbar
           title="VoiceFi"
@@ -26,7 +41,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 className="w-[38px] h-[38px] rounded-full grid place-items-center text-white font-semibold text-sm"
                 style={{ background: "linear-gradient(135deg, #4A90D9, #34C9A0)" }}
               >
-                EL
+                {initial}
               </span>
             </div>
           }

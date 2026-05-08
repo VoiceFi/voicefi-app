@@ -43,35 +43,27 @@ export default function LandingPage() {
             Your money. <span className="text-[var(--primary)]">Your voice.</span>
           </h1>
           <p
-            className="text-[var(--muted-foreground)] max-w-[620px] mx-auto mb-9 text-balance"
+            className="text-[var(--muted-foreground)] max-w-[620px] mx-auto mb-8 text-balance"
             style={{ fontSize: "clamp(18px, 2vw, 22px)", lineHeight: 1.5 }}
           >
             Talk to a friendly assistant to check your balance, send money, or exchange currencies. No passwords. No
             jargon. Just speak.
           </p>
-          <div className="flex gap-3.5 justify-center flex-wrap">
-            <Button asChild size="lg">
-              <Link href="/onboarding">
-                Get started <ArrowRight size={18} />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/dashboard">See it in action</Link>
-            </Button>
-          </div>
 
-          {/* Hero mic */}
-          <div
-            className="mx-auto mt-20 relative grid place-items-center"
+          {/* Hero mic — tap to sign in */}
+          <Link
+            href="/onboarding"
+            aria-label="Sign in"
+            className="mx-auto relative grid place-items-center cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--accent)] rounded-full transition-transform hover:scale-[1.02]"
             style={{ width: 380, maxWidth: "90vw", aspectRatio: "1" }}
-            aria-hidden="true"
           >
-            <div className="hero-mic-halo outer" />
-            <div className="hero-mic-halo" />
+            <div className="hero-mic-halo outer" aria-hidden="true" />
+            <div className="hero-mic-halo" aria-hidden="true" />
             <div className="hero-mic-orb">
-              <Mic size={64} strokeWidth={1.6} />
+              <Mic size={64} strokeWidth={1.6} aria-hidden="true" />
             </div>
-          </div>
+          </Link>
+          <p className="text-[var(--muted-foreground)]/40 text-xs mt-4 font-light tracking-wide">Tap the microphone to sign in</p>
         </div>
       </section>
 
