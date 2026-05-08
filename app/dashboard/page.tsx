@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Check } from "lucide-react";
 import { useWallets } from "@privy-io/react-auth/solana";
 import { MicOrb } from "@/components/voice/mic-orb";
@@ -12,6 +12,28 @@ import type { VoiceState, PendingTransaction } from "@/types/voice";
 export default function DashboardPage() {
   const { wallets } = useWallets();
   const walletAddress = wallets[0]?.address ?? "";
+
+  const [balance, setBalance] = useState<number | null>(null);
+  const [balanceLoading, setBalanceLoading] = useState(true);
+
+  const fetchBalance = useCallback(async () => {
+    if (!walletAddress) return;
+    try {
+      const res = await fetch(`/api/balance?walletAddress=${walletAddress}`);
+      const data = await res.json();
+      setBalance(data.totalUsd ?? 0);
+    } catch {
+      setBalance(0);
+    } finally {
+      setBalanceLoading(false);
+    }
+  }, [walletAddress]);
+
+  useEffect(() => {
+    fetchBalance();
+    const interval = setInterval(fetchBalance, 30_000);
+    return () => clearInterval(interval);
+  }, [fetchBalance]);
 
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [userTranscript, setUserTranscript] = useState("");
@@ -133,7 +155,11 @@ export default function DashboardPage() {
             className="font-bold tracking-tight leading-none mt-1.5"
             style={{ fontSize: "clamp(40px, 6vw, 56px)", letterSpacing: "-0.025em" }}
           >
-            $1,234.56
+            {balanceLoading ? (
+              <span className="text-[var(--muted-foreground)] opacity-40">$···</span>
+            ) : (
+              `$${(balance ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+            )}
           </div>
           {walletAddress && (
             <div className="mono text-xs text-[var(--muted-foreground)] mt-2">
