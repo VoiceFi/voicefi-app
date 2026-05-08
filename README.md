@@ -202,11 +202,11 @@ app/
   dashboard/
     page.tsx                  balance + voice + activity
     contacts/page.tsx
-    voice-settings/page.tsx
-    security/page.tsx
+    settings/page.tsx         voice preferences + security controls
 components/
   providers/                  ClientPrivyProvider, PrivyProviderWrapper
   layout/                     Sidebar, BottomNav, Topbar
+  settings/                   VoiceSection, SecuritySection
   ui/                         Button, Input, Card, Dialog, Slider, Switch
   voice/                      MicOrb, ConfirmationOverlay
 lib/

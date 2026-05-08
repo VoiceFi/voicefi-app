@@ -5,22 +5,28 @@ import { Check, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { mockVoices } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
-export default function VoiceSettingsPage() {
+export function VoiceSection() {
   const [selected, setSelected] = useState("aria");
   const [language, setLanguage] = useState("en-US");
 
   return (
-    <div className="max-w-[720px] mx-auto px-5 md:px-8 py-8 w-full" data-screen-label="Voice settings">
-      <header className="mb-7">
-        <h2 className="text-[30px] font-bold tracking-tight m-0">Choose your AI voice</h2>
-        <p className="text-[var(--muted-foreground)] mt-1.5 text-[15px]">
+    <section className="space-y-5">
+      <div>
+        <h3 className="text-lg font-semibold m-0">AI Voice</h3>
+        <p className="text-[var(--muted-foreground)] text-sm mt-1">
           Pick the voice that feels right. You can change it any time.
         </p>
-      </header>
+      </div>
 
       <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3.5">
         {mockVoices.map((v) => {
@@ -34,7 +40,9 @@ export default function VoiceSettingsPage() {
               aria-label={`${v.name}, ${v.tag}`}
               className={cn(
                 "bg-[var(--card)] border-[1.5px] rounded-[20px] p-5 cursor-pointer transition-all flex flex-col gap-3.5 text-left",
-                isSelected ? "border-[var(--primary)] bg-[var(--accent)]" : "border-[var(--border)] hover:border-[#b8d4f0]"
+                isSelected
+                  ? "border-[var(--primary)] bg-[var(--accent)]"
+                  : "border-[var(--border)] hover:border-[#b8d4f0]"
               )}
             >
               <div className="flex justify-between items-start gap-2">
@@ -75,7 +83,7 @@ export default function VoiceSettingsPage() {
         })}
       </div>
 
-      <Card className="mt-8">
+      <Card>
         <Label htmlFor="lang">Language preference</Label>
         <p className="text-[var(--muted-foreground)] text-sm mb-3.5 mt-0">
           The assistant will reply in this language.
@@ -95,9 +103,9 @@ export default function VoiceSettingsPage() {
         </Select>
       </Card>
 
-      <div className="flex justify-end mt-6">
+      <div className="flex justify-end">
         <Button>Save preferences</Button>
       </div>
-    </div>
+    </section>
   );
 }
