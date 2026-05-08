@@ -142,7 +142,7 @@ export function ConfirmationOverlay({
           </div>
         </div>
 
-        <p className="text-[var(--muted-foreground)] text-[15px] mb-2">You're about to send</p>
+        <p className="text-[var(--muted-foreground)] text-[15px] mb-2">You&rsquo;re about to send</p>
         <div
           id="confirm-title"
           className="font-bold tracking-tight leading-none mb-1.5"
