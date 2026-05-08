@@ -2,19 +2,28 @@
 
 import type { ReactNode } from "react";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import { Sidebar } from "@/components/layout/sidebar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Topbar } from "@/components/layout/topbar";
+import { TopbarUserMenu } from "@/components/layout/topbar-user-menu";
+import { SkipLink } from "@/components/ui/skip-link";
 
 function getInitials(email: string | null | undefined): string {
   if (!email) return "?";
   return email.slice(0, 2).toUpperCase();
 }
 
+const PAGE_TITLES: Record<string, string> = {
+  "/dashboard": "Home",
+  "/dashboard/contacts": "Contacts",
+  "/dashboard/settings": "Settings",
+};
+
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { ready, authenticated, user } = usePrivy();
 
   useEffect(() => {
@@ -25,8 +34,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   if (!ready) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--background)]">
-        <div className="w-8 h-8 rounded-full border-2 border-[var(--primary)] border-t-transparent animate-spin" />
+      <div
+        className="min-h-screen flex items-center justify-center bg-[var(--background)]"
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <div role="status" className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-[var(--primary)] border-t-transparent animate-spin" />
+          <span className="sr-only">Loading your dashboard…</span>
+        </div>
       </div>
     );
   }
@@ -35,33 +51,18 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   const userEmail = user?.email?.address ?? null;
   const initials = getInitials(userEmail);
+  const pageTitle = PAGE_TITLES[pathname] ?? "VoiceFi";
 
   return (
     <div className="min-h-screen flex bg-[var(--background)]">
+      <SkipLink />
       <Sidebar />
       <div className="flex-1 min-w-0 flex flex-col">
         <Topbar
-          title="VoiceFi"
-          right={
-            <div className="flex items-center gap-2.5">
-              <span className="text-[var(--muted-foreground)] text-[13px] flex items-center gap-1.5">
-                <span
-                  aria-hidden="true"
-                  className="w-2 h-2 rounded-full bg-[var(--secondary)]"
-                />
-                Connected
-              </span>
-              <span
-                aria-hidden="true"
-                className="w-[38px] h-[38px] rounded-full grid place-items-center text-white font-semibold text-sm"
-                style={{ background: "linear-gradient(135deg, #4A90D9, #34C9A0)" }}
-              >
-                {initials}
-              </span>
-            </div>
-          }
+          title={pageTitle}
+          right={<TopbarUserMenu initials={initials} email={userEmail} />}
         />
-        <main className="flex-1">{children}</main>
+        <main id="main-content" className="flex-1">{children}</main>
         <BottomNav />
       </div>
     </div>

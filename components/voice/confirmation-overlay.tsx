@@ -25,6 +25,58 @@ export function ConfirmationOverlay({
   const [holding, setHolding] = useState(false);
   const startRef = useRef(0);
   const rafRef = useRef(0);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const cancelBtnRef = useRef<HTMLButtonElement>(null);
+  const confirmBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Focus trap + initial focus + Escape
+  useEffect(() => {
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+
+    // Move focus to confirm button when overlay opens
+    confirmBtnRef.current?.focus();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onCancel();
+        return;
+      }
+
+      // Focus trap: cycle Tab within the overlay
+      if (e.key === "Tab") {
+        const focusable = overlay.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    // Prevent scrolling on body
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, [onCancel]);
 
   const tick = useCallback(() => {
     const elapsed = performance.now() - startRef.current;
@@ -33,7 +85,6 @@ export function ConfirmationOverlay({
     if (p >= 1) {
       setHolding(false);
       cancelAnimationFrame(rafRef.current);
-      // TODO: Solana web3.js + Helius RPC — sign + broadcast the transaction here.
       onConfirm();
       return;
     }
@@ -69,6 +120,7 @@ export function ConfirmationOverlay({
 
   return (
     <div
+      ref={overlayRef}
       className="confirm-overlay"
       role="dialog"
       aria-modal="true"
@@ -90,7 +142,7 @@ export function ConfirmationOverlay({
           </div>
         </div>
 
-        <p className="text-[var(--muted-foreground)] text-[15px] mb-2">You’re about to send</p>
+        <p className="text-[var(--muted-foreground)] text-[15px] mb-2">You&rsquo;re about to send</p>
         <div
           id="confirm-title"
           className="font-bold tracking-tight leading-none mb-1.5"
@@ -103,6 +155,7 @@ export function ConfirmationOverlay({
           {note && <> · <span>{note}</span></>}
         </div>
 
+        {/* Press-and-hold target */}
         <div className="relative w-[168px] h-[168px] mx-auto mb-6">
           <svg
             width="168"
@@ -138,20 +191,34 @@ export function ConfirmationOverlay({
 
         <p
           aria-live="polite"
-          className="text-[var(--primary)] font-semibold text-[17px] mb-6 tracking-tight"
+          className="text-[var(--primary)] font-semibold text-[17px] mb-5 tracking-tight"
         >
           {holding ? "Keep holding…" : "Press and hold to confirm"}
         </p>
 
-        <Button
-          variant="ghost"
-          onClick={onCancel}
-          data-no-hold
-          aria-label="Cancel transaction"
-          className="text-sm text-[var(--muted-foreground)]"
-        >
-          Cancel
-        </Button>
+        {/* Accessible alternative: Confirm button */}
+        <div className="flex flex-col gap-3 items-center">
+          <Button
+            ref={confirmBtnRef}
+            onClick={onConfirm}
+            data-no-hold
+            className="w-full"
+            size="lg"
+          >
+            Confirm ${amount.toFixed(2)}
+          </Button>
+
+          <Button
+            ref={cancelBtnRef}
+            variant="ghost"
+            onClick={onCancel}
+            data-no-hold
+            aria-label="Cancel transaction"
+            className="text-sm text-[var(--muted-foreground)]"
+          >
+            Cancel
+          </Button>
+        </div>
       </div>
     </div>
   );

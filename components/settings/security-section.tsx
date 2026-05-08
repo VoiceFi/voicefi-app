@@ -22,19 +22,26 @@ export function SecuritySection() {
 
       <Card>
         <div className="flex justify-between items-baseline mb-1">
-          <h4 className="text-base font-semibold m-0">Daily limit</h4>
-          <div className="text-[22px] font-bold tracking-tight">${limit}</div>
+          <h4 id="daily-limit-heading" className="text-base font-semibold m-0">Daily limit</h4>
+          <output
+            htmlFor="daily-limit-slider"
+            className="text-[22px] font-bold tracking-tight"
+            aria-live="polite"
+          >
+            ${limit}
+          </output>
         </div>
         <p className="text-[var(--muted-foreground)] text-sm mb-4 mt-0">
           The most you can send in a single day.
         </p>
         <Slider
+          id="daily-limit-slider"
           value={[limit]}
           min={0}
           max={500}
           step={10}
           onValueChange={(v) => setLimit(v[0] ?? 0)}
-          aria-label="Daily limit"
+          aria-labelledby="daily-limit-heading"
         />
         <div className="flex justify-between mt-2 text-xs text-[var(--muted-foreground)]">
           <span>$0</span>
@@ -44,7 +51,7 @@ export function SecuritySection() {
 
       <Card className="flex gap-4 items-start">
         <div className="flex-1">
-          <h4 className="text-base font-semibold m-0 mb-1">Extra confirmation</h4>
+          <h4 id="extra-confirm-heading" className="text-base font-semibold m-0 mb-1">Extra confirmation</h4>
           <p className="text-[var(--muted-foreground)] text-sm m-0">
             Require an additional confirmation for transactions above $50.
           </p>
@@ -52,7 +59,7 @@ export function SecuritySection() {
         <Switch
           checked={extraConfirm}
           onCheckedChange={setExtraConfirm}
-          aria-label="Extra confirmation"
+          aria-labelledby="extra-confirm-heading"
         />
       </Card>
 
@@ -82,10 +89,7 @@ export function SecuritySection() {
                 </div>
               </div>
               {i === 0 && (
-                <span
-                  className="px-2.5 py-1 rounded-full text-xs font-semibold"
-                  style={{ background: "rgba(52,201,160,0.15)", color: "var(--secondary)" }}
-                >
+                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[var(--secondary)] text-white">
                   This device
                 </span>
               )}

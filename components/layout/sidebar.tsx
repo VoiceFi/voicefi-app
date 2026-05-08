@@ -36,7 +36,7 @@ export function Sidebar() {
       aria-label="Primary navigation"
       className="hidden md:flex w-[260px] shrink-0 border-r border-[var(--border)] bg-[var(--card)] p-7 px-5 flex-col gap-1 sticky top-0 h-screen"
     >
-      <div className="flex items-center gap-3 px-2 pb-7 pt-1 font-bold text-[19px] tracking-tight">
+      <div className="flex items-center gap-3 px-2 pb-7 pt-1 font-display font-normal text-[19px] tracking-[0.12em]">
         <BrandMark />
         <span>VoiceFi</span>
       </div>
@@ -66,7 +66,7 @@ export function Sidebar() {
           <span
             aria-hidden="true"
             className="w-[38px] h-[38px] rounded-full grid place-items-center text-white font-semibold text-sm shrink-0"
-            style={{ background: "linear-gradient(135deg, #4A90D9, #34C9A0)" }}
+            style={{ background: "linear-gradient(135deg, #4A90D9, #168060)" }}
           >
             {initials}
           </span>
