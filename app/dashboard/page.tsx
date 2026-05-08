@@ -110,7 +110,7 @@ export default function DashboardPage() {
       setCurrentIntent(null);
       await conversation.startSession({
         agentId,
-        connectionType: "webrtc",
+        connectionType: "websocket",
       });
     } catch (err) {
       console.error("Failed to start voice session:", err);
