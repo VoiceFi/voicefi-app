@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { VoiceProviders } from "@/components/voice/voice-providers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
@@ -19,7 +20,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${geistMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <VoiceProviders>{children}</VoiceProviders>
+      </body>
     </html>
   );
 }

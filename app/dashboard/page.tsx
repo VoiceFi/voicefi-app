@@ -1,114 +1,164 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Check } from "lucide-react";
+import { useConversation } from "@elevenlabs/react";
 import { MicOrb } from "@/components/voice/mic-orb";
 import { ConfirmationOverlay } from "@/components/voice/confirmation-overlay";
 import { mockTransactions } from "@/lib/mock-data";
-import type { VoiceState, PendingTransaction } from "@/types/voice";
+import type { VoiceState, DetectedIntent, IntentType } from "@/types/voice";
+
+type PendingConfirmation = {
+  summary: string;
+  resolve: (confirmed: boolean) => void;
+};
 
 export default function DashboardPage() {
-  const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [userTranscript, setUserTranscript] = useState("");
   const [agentResponse, setAgentResponse] = useState("");
-  const [pendingTx, setPendingTx] = useState<PendingTransaction | null>(null);
+  const [currentIntent, setCurrentIntent] = useState<DetectedIntent | null>(null);
+  const [pendingConfirmation, setPendingConfirmation] = useState<PendingConfirmation | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const [isStarting, setIsStarting] = useState(false);
 
-  const clearTimers = () => {
-    timersRef.current.forEach(clearTimeout);
-    timersRef.current = [];
-  };
-  useEffect(() => () => clearTimers(), []);
+  const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const currentIntentRef = useRef<DetectedIntent | null>(null);
 
-  const animateUserTranscript = (text: string, onDone?: () => void) => {
-    setUserTranscript("");
-    let i = 0;
-    const step = () => {
-      i++;
-      setUserTranscript(text.slice(0, i));
-      if (i < text.length) timersRef.current.push(setTimeout(step, 45));
-      else onDone?.();
-    };
-    step();
-  };
+  useEffect(() => {
+    currentIntentRef.current = currentIntent;
+  }, [currentIntent]);
 
-  const animateAgentResponse = (text: string, onDone?: () => void) => {
-    setAgentResponse("");
-    const words = text.split(" ");
-    let i = 0;
-    const step = () => {
-      i++;
-      setAgentResponse(words.slice(0, i).join(" "));
-      if (i < words.length) timersRef.current.push(setTimeout(step, 110));
-      else onDone?.();
-    };
-    step();
-  };
+  useEffect(() => () => {
+    if (successTimerRef.current) clearTimeout(successTimerRef.current);
+  }, []);
 
-  const handleMicClick = () => {
-    // TODO: ElevenLabs integration here — call `useConversation().startSession()`
-    // and let the SDK drive `voiceState`, `userTranscript`, and `agentResponse`.
-    if (voiceState !== "idle") {
-      clearTimers();
-      setVoiceState("idle");
+  const conversation = useConversation({
+    clientTools: {
+      detectIntent: async (params) => {
+        const intent: DetectedIntent = {
+          intent: params.intent as IntentType,
+          amount: typeof params.amount === "number" ? params.amount : undefined,
+          token: typeof params.token === "string" ? params.token : undefined,
+          recipient: typeof params.recipient === "string" ? params.recipient : undefined,
+          timestamp: Date.now(),
+        };
+        setCurrentIntent(intent);
+        return JSON.stringify({ acknowledged: true });
+      },
+      requestConfirmation: async (params) => {
+        const summary = typeof params.summary === "string" ? params.summary : "";
+        const confirmed = await new Promise<boolean>((resolve) => {
+          setPendingConfirmation({ summary, resolve });
+        });
+        return JSON.stringify({ confirmed });
+      },
+      executeMockTransaction: async () => {
+        await new Promise((r) => setTimeout(r, 800));
+        setShowSuccess(true);
+        if (successTimerRef.current) clearTimeout(successTimerRef.current);
+        successTimerRef.current = setTimeout(() => setShowSuccess(false), 2800);
+        const intent = currentIntentRef.current;
+        return JSON.stringify({
+          success: true,
+          mockHash: "5xY...mock...abc",
+          intent: intent?.intent ?? null,
+        });
+      },
+    },
+    onMessage: ({ message, source }) => {
+      if (source === "user") {
+        setUserTranscript(message);
+      } else {
+        setAgentResponse(message);
+      }
+    },
+    onError: (message) => {
+      console.error("ElevenLabs error:", message);
+    },
+  });
+
+  const voiceState: VoiceState = useMemo(() => {
+    if (pendingConfirmation) return "awaiting-confirmation";
+    if (conversation.isSpeaking) return "speaking";
+    if (conversation.status === "connected") return "listening";
+    return "idle";
+  }, [pendingConfirmation, conversation.isSpeaking, conversation.status]);
+
+  const handleMicClick = async () => {
+    if (pendingConfirmation) return;
+
+    if (conversation.status === "connected" || isStarting) {
+      await conversation.endSession();
       setUserTranscript("");
       setAgentResponse("");
+      setCurrentIntent(null);
       return;
     }
 
-    setVoiceState("listening");
-    setUserTranscript("");
-    setAgentResponse("");
+    const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID;
+    if (!agentId) {
+      console.error("Missing NEXT_PUBLIC_ELEVENLABS_AGENT_ID");
+      alert("Agent ID is missing. Set NEXT_PUBLIC_ELEVENLABS_AGENT_ID in .env.local and restart.");
+      return;
+    }
 
-    timersRef.current.push(
-      setTimeout(() => {
-        animateUserTranscript("send fifty dollars to maria", () => {
-          timersRef.current.push(
-            setTimeout(() => {
-              setVoiceState("speaking");
-              timersRef.current.push(setTimeout(() => setUserTranscript(""), 4500));
-              animateAgentResponse("Press and hold to confirm sending $50 to Maria.", () => {
-                timersRef.current.push(
-                  setTimeout(() => {
-                    setPendingTx({ amount: 50, recipient: "Maria Lopez" });
-                    setVoiceState("awaiting-confirmation");
-                  }, 600)
-                );
-              });
-            }, 500)
-          );
-        });
-      }, 1200)
-    );
+    try {
+      setIsStarting(true);
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      setUserTranscript("");
+      setAgentResponse("");
+      setCurrentIntent(null);
+      await conversation.startSession({
+        agentId,
+        connectionType: "webrtc",
+      });
+    } catch (err) {
+      console.error("Failed to start voice session:", err);
+      alert("Couldn't access the microphone. Check browser permissions and try again.");
+    } finally {
+      setIsStarting(false);
+    }
   };
 
   const handleConfirm = () => {
-    // TODO: Solana web3.js / Jupiter v6 — sign + send the prepared transaction.
-    setPendingTx(null);
-    setVoiceState("speaking");
-    setShowSuccess(true);
-    animateAgentResponse("Done. $50 sent to Maria.", () => {
-      timersRef.current.push(
-        setTimeout(() => {
-          setVoiceState("idle");
-          setAgentResponse("");
-          timersRef.current.push(setTimeout(() => setShowSuccess(false), 600));
-        }, 2000)
-      );
-    });
+    pendingConfirmation?.resolve(true);
+    setPendingConfirmation(null);
   };
 
   const handleCancel = () => {
-    clearTimers();
-    setPendingTx(null);
-    setVoiceState("idle");
-    setAgentResponse("");
-    setUserTranscript("");
+    pendingConfirmation?.resolve(false);
+    setPendingConfirmation(null);
   };
 
+  const overlayProps = useMemo(() => {
+    if (!pendingConfirmation) return null;
+    const intent = currentIntent;
+    if (intent?.intent === "swap") {
+      return {
+        amount: intent.amount ?? 0,
+        recipient: intent.token ? `${intent.token} swap` : "swap",
+        note: pendingConfirmation.summary,
+      };
+    }
+    return {
+      amount: intent?.amount ?? 0,
+      recipient: intent?.recipient ?? "your wallet",
+      note: undefined,
+    };
+  }, [pendingConfirmation, currentIntent]);
+
+  const successMessage = useMemo(() => {
+    if (!currentIntent) return "Transaction confirmed";
+    if (currentIntent.intent === "swap") {
+      return `Swap confirmed`;
+    }
+    const amt = currentIntent.amount ?? 0;
+    const who = currentIntent.recipient ?? "your wallet";
+    return `$${amt} sent to ${who}`;
+  }, [currentIntent]);
+
   const status = {
-    idle: { text: "Tap to speak", color: "var(--muted-foreground)" },
+    idle: { text: isStarting ? "Connecting…" : "Tap to speak", color: "var(--muted-foreground)" },
     listening: { text: "Listening…", color: "var(--primary)" },
     speaking: { text: "Speaking…", color: "var(--secondary)" },
     "awaiting-confirmation": { text: "Press and hold to confirm", color: "var(--primary)" },
@@ -222,22 +272,23 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {pendingTx && (
+      {overlayProps && (
         <ConfirmationOverlay
-          amount={pendingTx.amount}
-          recipient={pendingTx.recipient}
+          amount={overlayProps.amount}
+          recipient={overlayProps.recipient}
+          note={overlayProps.note}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />
       )}
 
-      {showSuccess && !pendingTx && (
+      {showSuccess && !pendingConfirmation && (
         <div
           role="status"
           className="fixed bottom-[88px] left-1/2 -translate-x-1/2 bg-[var(--secondary)] text-white py-3 px-5 rounded-full font-semibold text-[15px] flex items-center gap-2.5 shadow-[0_12px_32px_rgba(52,201,160,0.3)] z-80 animate-fade-in-up"
           style={{ zIndex: 80 }}
         >
-          <Check size={18} strokeWidth={2.5} /> $50 sent to Maria
+          <Check size={18} strokeWidth={2.5} /> {successMessage}
         </div>
       )}
     </div>
