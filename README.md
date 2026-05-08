@@ -130,7 +130,7 @@ https://auth.privy.io/oauth/callback
 Ensure your `.env.local` contains the correct App ID:
 
 ```env
-NEXT_PUBLIC_PRIVY_APP_ID=cmowtskie00nx0cl2l3zxg6ce
+NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
 ```
 
 > **Tip:** Restart the development server (`npm run dev`) after any changes to environment variables, as `NEXT_PUBLIC_*` variables are evaluated at build time.
