@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { Plus, Trash2, Inbox } from "lucide-react";
 import { useWallets } from "@privy-io/react-auth/solana";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,15 @@ export default function ContactsPage() {
   const [addr, setAddr] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const deleteBtnRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const addBtnRef = useRef<HTMLButtonElement>(null);
+  const listContainerRef = useRef<HTMLDivElement>(null);
+
+  const setDeleteRef = useCallback((id: string, el: HTMLButtonElement | null) => {
+    if (el) deleteBtnRefs.current.set(id, el);
+    else deleteBtnRefs.current.delete(id);
+  }, []);
 
   useEffect(() => {
     if (!walletAddress) {
@@ -87,9 +96,23 @@ export default function ContactsPage() {
     setOpen(false);
   };
 
-  const deleteContact = async (id: string) => {
+  const deleteContact = async (id: string, index: number) => {
     const previous = contacts;
-    setContacts((c) => c.filter((x) => x.id !== id));
+    const next = previous.filter((x) => x.id !== id);
+    setContacts(next);
+
+    requestAnimationFrame(() => {
+      if (next.length === 0) {
+        addBtnRef.current?.focus();
+        return;
+      }
+      const nextId = next[index]?.id ?? next[next.length - 1]?.id;
+      if (nextId != null) {
+        const btn = deleteBtnRefs.current.get(nextId);
+        btn?.focus();
+      }
+    });
+
     const { error } = await supabase
       .from("contacts")
       .delete()
@@ -105,8 +128,8 @@ export default function ContactsPage() {
     <div className="max-w-[720px] mx-auto px-5 md:px-8 py-8 w-full" data-screen-label="Contacts">
       <header className="flex justify-between items-center mb-7">
         <div>
-          <h2 className="text-[30px] font-bold tracking-tight m-0">Contacts</h2>
-          <p className="text-[var(--muted-foreground)] mt-1.5 text-[15px]">
+          <h2 className="text-[28px] font-bold tracking-tight m-0">Contacts</h2>
+          <p className="text-[var(--muted-foreground)] mt-2 text-base leading-relaxed">
             People you can send money to by voice.
           </p>
         </div>
@@ -118,7 +141,7 @@ export default function ContactsPage() {
           }}
         >
           <DialogTrigger asChild>
-            <Button aria-label="Add contact">
+            <Button ref={addBtnRef} aria-label="Add contact">
               <Plus size={18} /> Add
             </Button>
           </DialogTrigger>
@@ -178,7 +201,10 @@ export default function ContactsPage() {
           <p>Add someone to send them money by voice.</p>
         </div>
       ) : (
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[22px] py-2 px-5">
+        <div
+          ref={listContainerRef}
+          className="bg-[var(--card)] border border-[var(--border)] rounded-[22px] py-2 px-5"
+        >
           {contacts.map((c, i) => (
             <div
               key={c.id}
@@ -189,7 +215,7 @@ export default function ContactsPage() {
               <div
                 aria-hidden="true"
                 className="w-[46px] h-[46px] rounded-full grid place-items-center text-white font-semibold shrink-0"
-                style={{ background: "linear-gradient(135deg, #4A90D9, #34C9A0)" }}
+                style={{ background: "linear-gradient(135deg, #4A90D9, #168060)" }}
               >
                 {c.name[0]?.toUpperCase() ?? "?"}
               </div>
@@ -200,9 +226,10 @@ export default function ContactsPage() {
                 </div>
               </div>
               <Button
+                ref={(el) => setDeleteRef(c.id, el)}
                 variant="danger"
                 size="icon"
-                onClick={() => deleteContact(c.id)}
+                onClick={() => deleteContact(c.id, i)}
                 aria-label={`Delete ${c.name}`}
               >
                 <Trash2 size={18} />

@@ -6,8 +6,8 @@ import { Home, Users, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { to: "/dashboard/contacts", label: "Contacts", Icon: Users },
   { to: "/dashboard", label: "Home", Icon: Home },
+  { to: "/dashboard/contacts", label: "Contacts", Icon: Users },
   { to: "/dashboard/settings", label: "Settings", Icon: Settings },
 ] as const;
 
