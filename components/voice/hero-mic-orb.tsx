@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 import { Mic } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function HeroMicOrb() {
   const [state, setState] = useState<"idle" | "listening">("idle");
@@ -79,14 +80,16 @@ export function HeroMicOrb() {
 
       {/* Orb */}
       <div
-        className="relative grid place-items-center text-white transition-transform duration-200 group-hover:scale-[1.04] active:scale-[0.96]"
+        className={cn(
+          "relative grid place-items-center text-white transition-transform duration-200 group-hover:scale-[1.04] active:scale-[0.96]",
+          state === "idle" && "animate-hero-orb"
+        )}
         style={{
           width: "82%",
           height: "82%",
           borderRadius: "999px",
           background: "radial-gradient(circle at 28% 28%, #6BB8FF 0%, #2F7DE1 40%, #1A5CBF 80%, #0E3D8A 100%)",
           boxShadow: "0 40px 100px rgba(47,125,225,0.45), inset 0 0 0 1px rgba(255,255,255,0.12), inset 0 2px 0 rgba(255,255,255,0.25)",
-          animation: state === "idle" ? "orb-float 8s ease-in-out infinite, orb-glow-pulse 4s ease-in-out infinite" : "none",
         }}
         aria-hidden="true"
       >

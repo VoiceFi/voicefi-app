@@ -146,38 +146,33 @@ export default function DashboardPage() {
       {/* Balance */}
       <section
         aria-label="Account balance"
-        className="rounded-[26px] border border-[var(--border)] py-7 px-8 flex items-end justify-between gap-5"
+        className="rounded-[26px] border border-[var(--border)] py-7 px-8"
         style={{ background: "linear-gradient(135deg, #EDF4FC 0%, #ffffff 100%)" }}
       >
-        <div>
-          <div className="text-[var(--muted-foreground)] text-sm font-medium">Your balance</div>
-          <div
-            className="font-bold tracking-tight leading-none mt-1.5"
-            style={{ fontSize: "clamp(40px, 6vw, 56px)", letterSpacing: "-0.025em" }}
-          >
-            {balanceLoading ? (
-              <span className="text-[var(--muted-foreground)] opacity-40">$···</span>
-            ) : (
-              `$${(balance ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-            )}
-          </div>
-          {walletAddress && (
-            <div className="mono text-xs text-[var(--muted-foreground)] mt-2">
-              {truncateAddress(walletAddress)}
-            </div>
+        <div className="text-[var(--muted-foreground)] text-sm font-medium">Your balance</div>
+        <div
+          className="font-bold tracking-tight leading-none mt-1.5"
+          style={{ fontSize: "clamp(40px, 6vw, 56px)", letterSpacing: "-0.025em" }}
+        >
+          {balanceLoading ? (
+            <span className="text-[var(--muted-foreground)] opacity-40">$···</span>
+          ) : (
+            `$${(balance ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
           )}
         </div>
-        <div className="flex items-center gap-1.5 text-[var(--secondary)] font-semibold text-sm pb-1.5">
-          <ArrowUpRight size={16} /> +$120 this week
-        </div>
+        {walletAddress && (
+          <div className="mono text-xs text-[var(--muted-foreground)] mt-2">
+            {truncateAddress(walletAddress)}
+          </div>
+        )}
       </section>
 
       {/* Voice region */}
-      <section aria-label="Voice assistant" className="py-10 text-center">
+      <section aria-label="Voice assistant" className="py-6 text-center">
         <div
           aria-live="polite"
           aria-atomic="true"
-          className="min-h-[100px] my-4 mb-1 text-center flex items-end justify-center"
+          className="min-h-[80px] mt-2 mb-1 text-center flex items-end justify-center"
         >
           {agentResponse && (
             <div
@@ -221,7 +216,13 @@ export default function DashboardPage() {
       <section aria-label="Recent activity" className="mt-8">
         <header className="flex justify-between items-baseline mb-2">
           <h2 className="text-[22px] font-semibold tracking-tight m-0">Recent activity</h2>
-          <a className="text-[var(--primary)] text-sm font-medium cursor-pointer">View all</a>
+          <button
+            type="button"
+            className="text-[var(--primary)] text-sm font-medium cursor-pointer bg-transparent border-none p-0"
+            aria-label="View all transactions"
+          >
+            View all
+          </button>
         </header>
         <div className="flex flex-col gap-1">
           {mockTransactions.map((t) => {
@@ -235,7 +236,7 @@ export default function DashboardPage() {
                   aria-hidden="true"
                   className={`w-11 h-11 rounded-2xl grid place-items-center shrink-0 ${
                     isReceived
-                      ? "bg-[rgba(52,201,160,0.12)] text-[var(--secondary)]"
+                      ? "bg-[rgba(22,128,96,0.12)] text-[var(--secondary)]"
                       : "bg-[var(--accent)] text-[var(--primary)]"
                   }`}
                 >
@@ -270,7 +271,7 @@ export default function DashboardPage() {
       {showSuccess && !pendingTx && (
         <div
           role="status"
-          className="fixed bottom-[88px] left-1/2 -translate-x-1/2 bg-[var(--secondary)] text-white py-3 px-5 rounded-full font-semibold text-[15px] flex items-center gap-2.5 shadow-[0_12px_32px_rgba(52,201,160,0.3)] z-80 animate-fade-in-up"
+          className="fixed bottom-[88px] left-1/2 -translate-x-1/2 bg-[var(--secondary)] text-white py-3 px-5 rounded-full font-semibold text-[15px] flex items-center gap-2.5 shadow-[0_12px_32px_rgba(22,128,96,0.3)] animate-fade-in-up"
           style={{ zIndex: 80 }}
         >
           <Check size={18} strokeWidth={2.5} /> $50 sent to Maria

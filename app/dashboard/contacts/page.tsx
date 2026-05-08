@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Plus, Trash2, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
@@ -13,6 +13,14 @@ export default function ContactsPage() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [addr, setAddr] = useState("");
+  const deleteBtnRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+  const addBtnRef = useRef<HTMLButtonElement>(null);
+  const listContainerRef = useRef<HTMLDivElement>(null);
+
+  const setDeleteRef = useCallback((id: number, el: HTMLButtonElement | null) => {
+    if (el) deleteBtnRefs.current.set(id, el);
+    else deleteBtnRefs.current.delete(id);
+  }, []);
 
   const addContact = () => {
     if (!name.trim() || !addr.trim()) return;
@@ -30,20 +38,42 @@ export default function ContactsPage() {
     setOpen(false);
   };
 
-  const deleteContact = (id: number) => setContacts((c) => c.filter((x) => x.id !== id));
+  const deleteContact = (id: number, index: number) => {
+    setContacts((prev) => {
+      const next = prev.filter((x) => x.id !== id);
+
+      // Move focus after React commits the DOM update
+      requestAnimationFrame(() => {
+        if (next.length === 0) {
+          // No contacts left → focus Add button
+          addBtnRef.current?.focus();
+          return;
+        }
+
+        // Try next contact at same index
+        const nextId = next[index]?.id ?? next[next.length - 1]?.id;
+        if (nextId != null) {
+          const btn = deleteBtnRefs.current.get(nextId);
+          btn?.focus();
+        }
+      });
+
+      return next;
+    });
+  };
 
   return (
     <div className="max-w-[720px] mx-auto px-5 md:px-8 py-8 w-full" data-screen-label="Contacts">
       <header className="flex justify-between items-center mb-7">
         <div>
-          <h2 className="text-[30px] font-bold tracking-tight m-0">Contacts</h2>
-          <p className="text-[var(--muted-foreground)] mt-1.5 text-[15px]">
+          <h2 className="text-[28px] font-bold tracking-tight m-0">Contacts</h2>
+          <p className="text-[var(--muted-foreground)] mt-2 text-base leading-relaxed">
             People you can send money to by voice.
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button aria-label="Add contact">
+            <Button ref={addBtnRef} aria-label="Add contact">
               <Plus size={18} /> Add
             </Button>
           </DialogTrigger>
@@ -91,7 +121,10 @@ export default function ContactsPage() {
           <p>Add someone to send them money by voice.</p>
         </div>
       ) : (
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[22px] py-2 px-5">
+        <div
+          ref={listContainerRef}
+          className="bg-[var(--card)] border border-[var(--border)] rounded-[22px] py-2 px-5"
+        >
           {contacts.map((c, i) => (
             <div
               key={c.id}
@@ -102,7 +135,7 @@ export default function ContactsPage() {
               <div
                 aria-hidden="true"
                 className="w-[46px] h-[46px] rounded-full grid place-items-center text-white font-semibold shrink-0"
-                style={{ background: "linear-gradient(135deg, #4A90D9, #34C9A0)" }}
+                style={{ background: "linear-gradient(135deg, #4A90D9, #168060)" }}
               >
                 {c.initial}
               </div>
@@ -113,9 +146,10 @@ export default function ContactsPage() {
                 </div>
               </div>
               <Button
+                ref={(el) => setDeleteRef(c.id, el)}
                 variant="danger"
                 size="icon"
-                onClick={() => deleteContact(c.id)}
+                onClick={() => deleteContact(c.id, i)}
                 aria-label={`Delete ${c.name}`}
               >
                 <Trash2 size={18} />

@@ -6,7 +6,7 @@
   --color-card: #FFFFFF;
   --color-primary: #2F7DE1;
   --color-primary-foreground: #FFFFFF;
-  --color-secondary: #34C9A0;
+  --color-secondary: #168060;
   --color-secondary-foreground: #1A1A1A;
   --color-muted: #F0EFEC;
   --color-muted-foreground: #6B6B6B;
@@ -29,9 +29,9 @@
   --primary-foreground: #FFFFFF;
   --primary-hover: #2469C8;
   --primary-glow: rgba(47,125,225,0.18);
-  --secondary: #34C9A0;
+  --secondary: #168060;
   --secondary-foreground: #1A1A1A;
-  --success: #34C9A0;
+  --success: #168060;
   --muted: #F0EFEC;
   --muted-foreground: #6B6B6B;
   --accent: #EDF4FC;
@@ -112,13 +112,13 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   background: radial-gradient(circle, rgba(74,144,217,0.35) 0%, rgba(74,144,217,0) 70%); }
 .mic-halo.listening { animation: halo-breathe 2.5s ease-in-out infinite; }
 .mic-halo.speaking { animation: halo-breathe 1.6s ease-in-out infinite;
-  background: radial-gradient(circle, rgba(52,201,160,0.4) 0%, rgba(52,201,160,0) 70%); }
+  background: radial-gradient(circle, rgba(22,128,96,0.4) 0%, rgba(22,128,96,0) 70%); }
 .mic-orb-bg { position: absolute; width: 170px; height: 170px; border-radius: 999px;
   background: radial-gradient(circle at 30% 30%, #6fb0ff 0%, #4A90D9 45%, #2c6fbf 100%);
   animation: orb-float 6s ease-in-out infinite; pointer-events: none; }
 .mic-orb-bg.idle { background: linear-gradient(140deg, #ffffff 0%, #f6f5f2 100%);
   border: 1px solid var(--border); animation: none; }
-.mic-orb-bg.speaking { background: radial-gradient(circle at 30% 30%, #7be3c2 0%, #34C9A0 45%, #1f9374 100%); }
+.mic-orb-bg.speaking { background: radial-gradient(circle at 30% 30%, #4ad4a8 0%, #168060 45%, #0d5c42 100%); }
 
 .mic-button { position: relative; width: 124px; height: 124px; border-radius: 999px;
   display: grid; place-items: center; z-index: 2; background: transparent; color: white;
@@ -142,9 +142,13 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 .hero-bg {
   background:
     radial-gradient(ellipse 80% 60% at 50% 30%, rgba(47,125,225,0.06) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(52,201,160,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(22,128,96,0.04) 0%, transparent 60%),
     var(--background);
 }
+.animate-hero-orb {
+  animation: orb-float 8s ease-in-out infinite, orb-glow-pulse 4s ease-in-out infinite;
+}
+
 @keyframes orb-glow-pulse {
   0%, 100% { box-shadow: 0 40px 100px rgba(47,125,225,0.4), 0 0 60px rgba(47,125,225,0.2), inset 0 0 0 1px rgba(255,255,255,0.12), inset 0 2px 0 rgba(255,255,255,0.25); }
   50%       { box-shadow: 0 40px 100px rgba(47,125,225,0.55), 0 0 90px rgba(47,125,225,0.3), inset 0 0 0 1px rgba(255,255,255,0.12), inset 0 2px 0 rgba(255,255,255,0.25); }
@@ -182,7 +186,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 .cta-section {
   background:
     radial-gradient(ellipse 100% 100% at 20% 50%, rgba(47,125,225,0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 80% 80% at 80% 50%, rgba(52,201,160,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 80% at 80% 50%, rgba(22,128,96,0.08) 0%, transparent 60%),
     #FFFFFF;
   border: 1px solid var(--border);
   border-radius: 32px;
@@ -211,6 +215,31 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .reveal-base { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---------- Reduced Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-soft,
+  .animate-sound-wave,
+  .animate-speaking-wave,
+  .animate-orb-float,
+  .animate-halo-breathe,
+  .animate-hero-orb {
+    animation: none !important;
+  }
+
+  .animate-fade-in-up,
+  .animate-fade-out-down {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .mic-orb-bg,
+  .mic-halo.listening,
+  .mic-halo.speaking {
+    animation: none !important;
+  }
 }
 
 /* ---------- Inputs / sliders ---------- */

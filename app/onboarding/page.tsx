@@ -126,7 +126,7 @@ export default function OnboardingPage() {
         <div className="max-w-[480px] w-full mx-auto bg-[var(--card)] border border-[var(--border)] rounded-[28px] p-9 animate-fade-in-up">
           <div
             className="w-16 h-16 rounded-[22px] grid place-items-center mx-auto mb-5"
-            style={{ background: "rgba(52,201,160,0.15)", color: "var(--secondary)" }}
+            style={{ background: "rgba(22,128,96,0.15)", color: "var(--secondary)" }}
           >
             <Check size={32} />
           </div>

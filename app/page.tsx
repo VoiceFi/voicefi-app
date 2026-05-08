@@ -6,14 +6,16 @@ import { BrandMark } from "@/components/brand/brand-mark";
 import { StickyHeader } from "@/components/layout/sticky-header";
 import { Reveal } from "@/components/ui/reveal";
 import { HeroMicOrb } from "@/components/voice/hero-mic-orb";
+import { SkipLink } from "@/components/ui/skip-link";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[var(--background)]" data-screen-label="Landing">
+      <SkipLink />
       <StickyHeader />
 
       {/* Hero */}
-      <section className="hero-bg pt-24 pb-8 text-center">
+      <section id="main-content" className="hero-bg pt-24 pb-8 text-center">
         <div className="max-w-[1120px] mx-auto px-5 md:px-8">
           {/* Badge */}
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--primary)]/20 bg-[var(--accent)] text-[var(--primary)] text-[12px] font-semibold uppercase tracking-[0.08em]">
@@ -90,7 +92,7 @@ export default function LandingPage() {
               <div>
                 <div
                   aria-hidden="true"
-                  className="w-14 h-14 rounded-2xl bg-[rgba(52,201,160,0.10)] text-[var(--secondary)] grid place-items-center mb-7"
+                  className="w-14 h-14 rounded-2xl bg-[rgba(22,128,96,0.10)] text-[var(--secondary)] grid place-items-center mb-7"
                 >
                   <Mic size={28} strokeWidth={1.5} />
                 </div>
@@ -245,9 +247,9 @@ export default function LandingPage() {
             <span>VoiceFi · 2026</span>
           </div>
           <div className="flex gap-6">
-            <a className="hover:text-[var(--foreground)] transition-colors">Privacy</a>
-            <a className="hover:text-[var(--foreground)] transition-colors">Terms</a>
-            <a className="hover:text-[var(--foreground)] transition-colors">Help</a>
+            <button type="button" className="hover:text-[var(--foreground)] transition-colors bg-transparent border-none p-0 cursor-pointer">Privacy</button>
+            <button type="button" className="hover:text-[var(--foreground)] transition-colors bg-transparent border-none p-0 cursor-pointer">Terms</button>
+            <button type="button" className="hover:text-[var(--foreground)] transition-colors bg-transparent border-none p-0 cursor-pointer">Help</button>
           </div>
         </div>
       </footer>

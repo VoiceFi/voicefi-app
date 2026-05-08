@@ -66,7 +66,7 @@ export function Sidebar() {
           <span
             aria-hidden="true"
             className="w-[38px] h-[38px] rounded-full grid place-items-center text-white font-semibold text-sm shrink-0"
-            style={{ background: "linear-gradient(135deg, #4A90D9, #34C9A0)" }}
+            style={{ background: "linear-gradient(135deg, #4A90D9, #168060)" }}
           >
             {initials}
           </span>
