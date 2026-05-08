@@ -1,36 +1,105 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus, Trash2, Inbox } from "lucide-react";
+import { useWallets } from "@privy-io/react-auth/solana";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { mockContacts, type Contact } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/client";
 import { truncateAddress } from "@/lib/utils";
 
+type Contact = { id: string; name: string; address: string };
+
+const SOLANA_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+
 export default function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>(mockContacts);
+  const supabase = useMemo(() => createClient(), []);
+  const { wallets } = useWallets();
+  const walletAddress = wallets[0]?.address ?? "";
+
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [addr, setAddr] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const addContact = () => {
-    if (!name.trim() || !addr.trim()) return;
-    setContacts((c) => [
-      ...c,
-      {
-        id: Date.now(),
-        name: name.trim(),
-        address: addr.trim(),
-        initial: name.trim()[0].toUpperCase(),
-      },
-    ]);
+  useEffect(() => {
+    if (!walletAddress) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("contacts")
+        .select("id, name, address")
+        .eq("wallet_address", walletAddress)
+        .order("created_at", { ascending: false });
+      if (cancelled) return;
+      if (error) setError(error.message);
+      else setContacts(data ?? []);
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, walletAddress]);
+
+  const addContact = async () => {
+    const n = name.trim();
+    const a = addr.trim();
+    if (!walletAddress) {
+      setError("Connect a wallet to save contacts.");
+      return;
+    }
+    if (!n) {
+      setError("Please enter a name.");
+      return;
+    }
+    if (!SOLANA_ADDRESS_RE.test(a)) {
+      setError("That doesn’t look like a valid Solana address.");
+      return;
+    }
+    setSaving(true);
+    setError(null);
+
+    const { data, error: insertError } = await supabase
+      .from("contacts")
+      .insert({ wallet_address: walletAddress, name: n, address: a })
+      .select("id, name, address")
+      .single();
+
+    setSaving(false);
+    if (insertError) {
+      setError(
+        insertError.code === "23505"
+          ? "You already saved this address."
+          : insertError.message,
+      );
+      return;
+    }
+    if (data) setContacts((c) => [data, ...c]);
     setName("");
     setAddr("");
     setOpen(false);
   };
 
-  const deleteContact = (id: number) => setContacts((c) => c.filter((x) => x.id !== id));
+  const deleteContact = async (id: string) => {
+    const previous = contacts;
+    setContacts((c) => c.filter((x) => x.id !== id));
+    const { error } = await supabase
+      .from("contacts")
+      .delete()
+      .eq("id", id)
+      .eq("wallet_address", walletAddress);
+    if (error) {
+      setError(error.message);
+      setContacts(previous);
+    }
+  };
 
   return (
     <div className="max-w-[720px] mx-auto px-5 md:px-8 py-8 w-full" data-screen-label="Contacts">
@@ -41,7 +110,13 @@ export default function ContactsPage() {
             People you can send money to by voice.
           </p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+          open={open}
+          onOpenChange={(v) => {
+            setOpen(v);
+            if (!v) setError(null);
+          }}
+        >
           <DialogTrigger asChild>
             <Button aria-label="Add contact">
               <Plus size={18} /> Add
@@ -72,17 +147,29 @@ export default function ContactsPage() {
               className="mono text-sm"
             />
 
+            {error && (
+              <p className="text-sm text-[var(--destructive)] mt-3">{error}</p>
+            )}
+
             <div className="flex gap-2.5 mt-6 justify-end">
               <Button variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={addContact}>Save contact</Button>
+              <Button onClick={addContact} disabled={saving}>
+                {saving ? "Saving…" : "Save contact"}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
       </header>
 
-      {contacts.length === 0 ? (
+      {!open && error && (
+        <p className="text-sm text-[var(--destructive)] mb-4">{error}</p>
+      )}
+
+      {loading ? (
+        <div className="text-center py-16 text-[var(--muted-foreground)]">Loading…</div>
+      ) : contacts.length === 0 ? (
         <div className="text-center py-16 text-[var(--muted-foreground)]">
           <div className="w-20 h-20 mx-auto mb-5 rounded-[28px] bg-[var(--accent)] text-[var(--primary)] grid place-items-center">
             <Inbox size={36} />
@@ -104,7 +191,7 @@ export default function ContactsPage() {
                 className="w-[46px] h-[46px] rounded-full grid place-items-center text-white font-semibold shrink-0"
                 style={{ background: "linear-gradient(135deg, #4A90D9, #34C9A0)" }}
               >
-                {c.initial}
+                {c.name[0]?.toUpperCase() ?? "?"}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-base">{c.name}</div>
