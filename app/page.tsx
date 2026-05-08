@@ -49,29 +49,14 @@ export default function LandingPage() {
             Talk to a friendly assistant to check your balance, send money, or exchange currencies. No passwords. No
             jargon. Just speak.
           </p>
-          <div className="flex gap-3.5 justify-center flex-wrap">
-            <Button asChild size="lg">
-              <Link href="/onboarding">
-                Get started <ArrowRight size={18} />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/dashboard">See it in action</Link>
-            </Button>
-          </div>
-
           {/* Hero mic */}
-          <div
-            className="mx-auto mt-20 relative grid place-items-center"
-            style={{ width: 380, maxWidth: "90vw", aspectRatio: "1" }}
-            aria-hidden="true"
-          >
+          <Link href="/onboarding" className="block mx-auto mt-20 relative grid place-items-center cursor-pointer" style={{ width: 380, maxWidth: "90vw", aspectRatio: "1" }}>
             <div className="hero-mic-halo outer" />
             <div className="hero-mic-halo" />
             <div className="hero-mic-orb">
               <Mic size={64} strokeWidth={1.6} />
             </div>
-          </div>
+          </Link>
         </div>
       </section>
 
