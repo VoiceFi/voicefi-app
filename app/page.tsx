@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { StickyHeader } from "@/components/layout/sticky-header";
 import { Reveal } from "@/components/ui/reveal";
+import { HeroMicOrb } from "@/components/voice/hero-mic-orb";
 
 export default function LandingPage() {
   return (
@@ -33,23 +34,15 @@ export default function LandingPage() {
 
           {/* Subtitle */}
           <p
-            className="text-[var(--muted-foreground)] max-w-[580px] mx-auto mb-5 text-balance"
-            style={{ fontSize: "clamp(17px, 2vw, 21px)", lineHeight: 1.55 }}
+            className="text-[var(--muted-foreground)] max-w-[480px] mx-auto mb-6 text-balance"
+            style={{ fontSize: "clamp(17px, 2vw, 20px)", lineHeight: 1.5 }}
           >
-            Talk to a friendly assistant to check your balance, send money, or exchange currencies.
-            No passwords. No jargon. Just speak.
+            Touch the mic to start
           </p>
 
           {/* Hero Orb */}
-          <div
-            className="mx-auto relative grid place-items-center"
-            style={{ width: "clamp(260px, 30vw, 340px)", maxWidth: "85vw", aspectRatio: "1" }}
-          >
-            <div className="hero-mic-halo outer" />
-            <div className="hero-mic-halo" />
-            <div className="hero-mic-orb">
-              <Mic size={56} strokeWidth={1.5} />
-            </div>
+          <div className="flex justify-center">
+            <HeroMicOrb />
           </div>
         </div>
       </section>
@@ -68,8 +61,9 @@ export default function LandingPage() {
             >
               Banking that listens
             </h2>
-            <p className="text-[var(--muted-foreground)] text-lg">
-              Three reasons to never type an account number again.
+            <p className="text-[var(--muted-foreground)] text-base leading-relaxed max-w-[520px] mx-auto">
+              Send money, check your balance, or exchange currencies — just by talking.
+              No forms to fill out, no passwords to remember, no app to learn.
             </p>
           </div>
 
