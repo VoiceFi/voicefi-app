@@ -1,4 +1,4 @@
-# Proven
+# VoiceFi
 
 Voice-first money assistant. Next.js 15 (App Router) + TypeScript + Tailwind CSS v4 + shadcn/ui patterns + lucide-react.
 
