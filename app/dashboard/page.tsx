@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Check } from "lucide-react";
+import { usePrivy } from "@privy-io/react-auth";
 import { useWallets } from "@privy-io/react-auth/solana";
 import { useConversation } from "@elevenlabs/react";
 import { MicOrb } from "@/components/voice/mic-orb";
@@ -16,8 +17,17 @@ type PendingConfirmation = {
 };
 
 export default function DashboardPage() {
+  const { user } = usePrivy();
   const { wallets } = useWallets();
   const walletAddress = wallets[0]?.address ?? "";
+
+  const userName = useMemo(() => {
+    const email = user?.email?.address;
+    if (!email) return "there";
+    const local = email.split("@")[0] ?? "";
+    const first = local.split(/[._-]/)[0] ?? local;
+    return first ? first.charAt(0).toUpperCase() + first.slice(1) : "there";
+  }, [user?.email?.address]);
 
   const [balance, setBalance] = useState<number | null>(null);
   const [balanceLoading, setBalanceLoading] = useState(true);
@@ -218,11 +228,11 @@ export default function DashboardPage() {
       </section>
 
       {/* Voice region */}
-      <section aria-label="Voice assistant" className="py-6 text-center">
+      <section aria-label="Voice assistant" className="pt-3 pb-10 text-center">
         <div
           aria-live="polite"
           aria-atomic="true"
-          className="min-h-[80px] mt-2 mb-1 text-center flex items-end justify-center"
+          className="min-h-[64px] mt-1 mb-1 text-center flex items-end justify-center"
         >
           {agentResponse && (
             <div
@@ -238,7 +248,7 @@ export default function DashboardPage() {
               className="font-medium text-[var(--muted-foreground)] text-balance max-w-[600px]"
               style={{ fontSize: 22 }}
             >
-              Hi Elena. What can I help with?
+              Hi {userName}. What can I help with?
             </div>
           )}
         </div>
