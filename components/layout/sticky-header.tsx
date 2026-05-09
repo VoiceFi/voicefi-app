@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { BrandMark } from "@/components/brand";
 
 export function StickyHeader() {
@@ -28,15 +28,18 @@ export function StickyHeader() {
           <BrandMark size={36} />
           <span className="font-brand font-medium text-lg tracking-[0.04em]">VoiceFi</span>
         </Link>
-        <Button
-          asChild
-          size="default"
-          className="shadow-xl shadow-[var(--primary-glow)] font-semibold tracking-wide"
-        >
-          <Link href="/onboarding">
-            Get started <ArrowRight size={18} strokeWidth={2.5} />
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button
+            asChild
+            size="md"
+            className="shadow-xl shadow-[var(--primary-glow)] font-semibold tracking-wide"
+          >
+            <Link href="/onboarding">
+              Get started
+            </Link>
+          </Button>
+        </div>
       </div>
     </header>
   );

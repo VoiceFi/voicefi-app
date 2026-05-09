@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #F8F7F4;
-  --color-foreground: #1A1A1A;
-  --color-card: #FFFFFF;
-  --color-primary: #2F7DE1;
-  --color-primary-foreground: #FFFFFF;
-  --color-secondary: #168060;
-  --color-secondary-foreground: #1A1A1A;
-  --color-muted: #F0EFEC;
-  --color-muted-foreground: #6B6B6B;
-  --color-accent: #EDF4FC;
-  --color-destructive: #E53935;
-  --color-border: #E5E4E1;
-  --color-input: #F5F4F1;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
   --radius: 1rem;
 
   --font-sans: "Inter", "Geist", ui-sans-serif, system-ui, sans-serif;
@@ -46,6 +46,38 @@
   --surface-overlay: rgba(248,247,244,0.82);
   --foreground-secondary: #4A4A4A;
   --foreground-tertiary: #7A7A7A;
+  --nav-scrolled-bg: rgba(248,247,244,0.95);
+  --mic-idle-from: #ffffff;
+  --mic-idle-to: #f6f5f2;
+}
+
+.dark {
+  --background: #0F1115;
+  --foreground: #F0F0F0;
+  --card: #181A20;
+  --primary: #4A90D9;
+  --primary-foreground: #FFFFFF;
+  --primary-hover: #5FA0E6;
+  --primary-glow: rgba(74,144,217,0.25);
+  --secondary: #2ECC81;
+  --secondary-foreground: #F0F0F0;
+  --success: #2ECC81;
+  --muted: #1E2028;
+  --muted-foreground: #9CA3AF;
+  --accent: #1A2332;
+  --destructive: #FF5A52;
+  --border: #2A2D36;
+  --border-subtle: rgba(42,45,54,0.5);
+  --border-strong: #3A3D48;
+  --input: #1E2028;
+  --surface-raised: #1E2028;
+  --surface-sunken: #0F1115;
+  --surface-overlay: rgba(15,17,21,0.82);
+  --foreground-secondary: #D1D5DB;
+  --foreground-tertiary: #9CA3AF;
+  --nav-scrolled-bg: rgba(15,17,21,0.95);
+  --mic-idle-from: #252830;
+  --mic-idle-to: #1c1e26;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -57,6 +89,7 @@ html, body {
   font-size: 17px; line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 button { font-family: inherit; }
@@ -118,7 +151,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 .mic-orb-bg { position: absolute; width: 170px; height: 170px; border-radius: 999px;
   background: radial-gradient(circle at 30% 30%, #6fb0ff 0%, #4A90D9 45%, #2c6fbf 100%);
   animation: orb-float 6s ease-in-out infinite; pointer-events: none; }
-.mic-orb-bg.idle { background: linear-gradient(140deg, #ffffff 0%, #f6f5f2 100%);
+.mic-orb-bg.idle { background: linear-gradient(140deg, var(--mic-idle-from) 0%, var(--mic-idle-to) 100%);
   border: 1px solid var(--border); animation: none; }
 .mic-orb-bg.speaking { background: radial-gradient(circle at 30% 30%, #4ad4a8 0%, #168060 45%, #0d5c42 100%); }
 
@@ -165,7 +198,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 .nav-header.scrolled {
-  background: rgba(248,247,244,0.95);
+  background: var(--nav-scrolled-bg);
   border-color: var(--border-strong);
 }
 
@@ -189,7 +222,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   background:
     radial-gradient(ellipse 100% 100% at 20% 50%, rgba(47,125,225,0.12) 0%, transparent 60%),
     radial-gradient(ellipse 80% 80% at 80% 50%, rgba(22,128,96,0.08) 0%, transparent 60%),
-    #FFFFFF;
+    var(--card);
   border: 1px solid var(--border);
   border-radius: 32px;
   overflow: hidden;

@@ -27,7 +27,7 @@ export function LandingFooter() {
     <footer className="border-t border-[var(--border)] bg-[var(--background)]">
       <div className="max-w-[1120px] mx-auto px-5 md:px-8">
         {/* Main footer content */}
-        <div className="py-12 md:py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+        <div className="py-10 md:py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
           {/* Brand column */}
           <div className="sm:col-span-2 lg:col-span-1">
             <Link
@@ -41,8 +41,7 @@ export function LandingFooter() {
               </span>
             </Link>
             <p className="text-[var(--muted-foreground)] text-sm leading-relaxed max-w-[260px]">
-              Your money, controlled by voice. Built on Solana for speed,
-              security, and simplicity.
+              Send, check, and manage money — just by speaking. No forms. No passwords. No friction.
             </p>
           </div>
 

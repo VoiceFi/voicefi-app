@@ -15,12 +15,12 @@ export default function LandingPage() {
       <StickyHeader />
 
       {/* Hero */}
-      <section id="main-content" className="hero-bg pt-24 pb-8 text-center">
+      <section id="main-content" className="hero-bg pt-20 pb-6 text-center">
         <div className="max-w-[1120px] mx-auto px-5 md:px-8">
           {/* Badge */}
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--primary)]/20 bg-[var(--accent)] text-[var(--primary)] text-[12px] font-semibold uppercase tracking-[0.08em]">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-[pulse-soft_2.5s_ease-in-out_infinite]" />
-            Voice-first banking · Solana
+            Voice-first payments · Solana
           </span>
 
           {/* Headline */}
@@ -39,7 +39,7 @@ export default function LandingPage() {
             className="text-[var(--muted-foreground)] max-w-[480px] mx-auto mb-6 text-balance"
             style={{ fontSize: "clamp(17px, 2vw, 20px)", lineHeight: 1.5 }}
           >
-            Touch the mic to start
+            Your financial assistant, always ready to listen.
           </p>
 
           {/* Hero Orb */}
@@ -50,12 +50,12 @@ export default function LandingPage() {
       </section>
 
       {/* Features — Bento Grid */}
-      <section className="max-w-[1120px] mx-auto px-5 md:px-8 py-16">
+      <section className="max-w-[1120px] mx-auto px-5 md:px-8 py-12 md:py-16">
         <Reveal>
           {/* Section header */}
           <div className="text-center max-w-[640px] mx-auto mb-10">
             <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--primary)] block mb-3">
-              Why VoiceFi
+              Built different
             </span>
             <h2
               className="font-display font-normal tracking-tight mb-4"
@@ -129,14 +129,11 @@ export default function LandingPage() {
               >
                 <Zap size={28} strokeWidth={1.5} />
               </div>
-              <p className="font-mono text-[40px] font-bold text-[var(--foreground)] leading-none mb-2">
-                &lt;2s
-              </p>
-              <h3 className="text-[22px] font-semibold tracking-tight mb-3">
+              <h3 className="text-[22px] font-semibold tracking-tight mb-3 mt-2">
                 Fast and reliable
               </h3>
               <p className="text-[var(--muted-foreground)] text-base leading-relaxed">
-                Money moves in seconds with near-zero fees. Built on Solana, trusted by millions.
+                Transactions settle in seconds with near-zero fees. Built on Solana — one of the fastest blockchains on the planet.
               </p>
             </Card>
           </div>
@@ -146,11 +143,11 @@ export default function LandingPage() {
       {/* How it works */}
       <section
         id="how-it-works"
-        className="max-w-[1120px] mx-auto px-5 md:px-8 py-16"
+        className="max-w-[1120px] mx-auto px-5 md:px-8 py-12 md:py-16"
       >
         <div className="text-center max-w-[640px] mx-auto mb-10">
           <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--primary)] block mb-3">
-            Three steps
+            Up and running
           </span>
           <h2
             className="font-display font-normal tracking-tight mb-4"
@@ -190,7 +187,7 @@ export default function LandingPage() {
               },
               {
                 n: 3,
-                title: "Confirm and done",
+                title: "Confirm and go",
                 body: "Press and hold to confirm any payment. That's your voice signature.",
                 delay: 200,
               },
@@ -215,26 +212,51 @@ export default function LandingPage() {
 
       {/* CTA */}
       <Reveal>
-        <section className="max-w-[1120px] mx-auto px-5 md:px-8 py-14 text-center">
-          <div className="cta-section py-14 px-8">
+        <section className="max-w-[1120px] mx-auto px-5 md:px-8 py-10 md:py-12 text-center">
+          <div className="cta-section py-10 px-6 md:py-14 md:px-10">
+
+            {/* Voice wave decoration */}
+            <div className="flex items-end justify-center gap-[3px] mb-8" aria-hidden="true">
+              {[0.35, 0.55, 0.8, 1, 0.7, 1, 0.85, 0.55, 0.35].map((h, i) => (
+                <span
+                  key={i}
+                  className="w-[3px] rounded-full bg-[var(--primary)] animate-speaking-wave"
+                  style={{
+                    height: `${h * 32}px`,
+                    opacity: 0.15 + h * 0.2,
+                    animationDelay: `${i * 0.09}s`,
+                  }}
+                />
+              ))}
+            </div>
+
             <h2
-              className="font-display font-normal tracking-tight mb-3.5 text-balance"
-              style={{ fontSize: "clamp(32px, 4.5vw, 52px)" }}
+              className="font-display font-normal tracking-tight mb-4 text-balance"
+              style={{ fontSize: "clamp(34px, 5vw, 58px)" }}
             >
-              Ready to try it?
+              Your first voice transaction is one tap away.
             </h2>
-            <p className="text-[var(--muted-foreground)] text-lg mb-6 max-w-[440px] mx-auto">
+            <p className="text-[var(--muted-foreground)] text-base mb-8 max-w-[380px] mx-auto leading-relaxed">
               Set up takes less than a minute. Your voice is all you need.
             </p>
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="shadow-[0_8px_32px_var(--primary-glow)]">
               <Link href="/onboarding">
-                Get started free <ArrowRight size={18} />
+                Try VoiceFi Free <ArrowRight size={18} />
               </Link>
             </Button>
-            <p className="mt-4 text-[13px] text-[var(--foreground-tertiary)] flex items-center justify-center gap-2">
-              <Lock size={12} />
-              No card required · Setup in under 60 seconds · Built on Solana
-            </p>
+
+            {/* Trust pills */}
+            <div className="mt-6 flex items-center justify-center flex-wrap gap-2.5">
+              {["No card required", "60-second setup", "Built on Solana"].map((label) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--background)] border border-[var(--border)] text-[12px] text-[var(--muted-foreground)]"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-[pulse-soft_2.5s_ease-in-out_infinite]" />
+                  {label}
+                </span>
+              ))}
+            </div>
           </div>
         </section>
       </Reveal>
