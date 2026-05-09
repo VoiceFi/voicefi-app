@@ -2,8 +2,8 @@ import Link from "next/link";
 import { ArrowRight, Lock, Mic, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { BrandMark } from "@/components/brand/brand-mark";
 import { StickyHeader } from "@/components/layout/sticky-header";
+import { LandingFooter } from "@/components/layout/landing-footer";
 import { Reveal } from "@/components/ui/reveal";
 import { HeroMicOrb } from "@/components/voice/hero-mic-orb";
 import { SkipLink } from "@/components/ui/skip-link";
@@ -26,7 +26,7 @@ export default function LandingPage() {
           {/* Headline */}
           <h1
             className="font-display font-normal tracking-tight leading-[1.05] my-6 text-balance"
-            style={{ fontSize: "clamp(48px, 7vw, 92px)" }}
+            style={{ fontSize: "clamp(56px, 10vw, 140px)" }}
           >
             Your money.{" "}
             <em className="not-italic bg-gradient-to-br from-[#2F7DE1] to-[#5BA8F5] bg-clip-text text-transparent">
@@ -239,20 +239,7 @@ export default function LandingPage() {
         </section>
       </Reveal>
 
-      {/* Footer */}
-      <footer className="border-t border-[var(--border)] py-6 text-[var(--muted-foreground)] text-sm">
-        <div className="max-w-[1120px] mx-auto px-5 md:px-8 flex justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-2.5">
-            <BrandMark size={28} />
-            <span>VoiceFi · 2026</span>
-          </div>
-          <div className="flex gap-6">
-            <button type="button" className="hover:text-[var(--foreground)] transition-colors bg-transparent border-none p-0 cursor-pointer">Privacy</button>
-            <button type="button" className="hover:text-[var(--foreground)] transition-colors bg-transparent border-none p-0 cursor-pointer">Terms</button>
-            <button type="button" className="hover:text-[var(--foreground)] transition-colors bg-transparent border-none p-0 cursor-pointer">Help</button>
-          </div>
-        </div>
-      </footer>
+      <LandingFooter />
     </div>
   );
 }

@@ -8,7 +8,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useWallets } from "@privy-io/react-auth/solana";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
-import { BrandMark } from "@/components/brand/brand-mark";
+import { BrandMark } from "@/components/brand";
 import { truncateAddress } from "@/lib/utils";
 
 function GoogleIcon({ size = 20 }: { size?: number }) {
@@ -67,7 +67,7 @@ export default function OnboardingPage() {
     <div className="min-h-screen flex flex-col p-6" data-screen-label="Onboarding">
       <Link href="/" className="flex items-center gap-3 mb-8 self-start">
         <BrandMark size={32} />
-        <span className="font-display font-normal text-base tracking-[0.12em]">VoiceFi</span>
+        <span className="font-brand font-medium text-base tracking-[0.04em]">VoiceFi</span>
       </Link>
 
       <div className="h-1.5 bg-[var(--muted)] rounded-full max-w-[480px] w-full mx-auto overflow-hidden">
