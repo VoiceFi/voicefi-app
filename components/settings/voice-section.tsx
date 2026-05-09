@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Check, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -18,6 +18,19 @@ import { cn } from "@/lib/utils";
 export function VoiceSection() {
   const [selected, setSelected] = useState("aria");
   const [language, setLanguage] = useState("en-US");
+  const [saved, setSaved] = useState(false);
+  const saveRef = useRef<HTMLDivElement>(null);
+
+  const handleSave = () => {
+    setSaved(true);
+    // Reset saved state after 3 seconds
+    setTimeout(() => setSaved(false), 3000);
+  };
+
+  const handlePreview = (voiceName: string) => {
+    // TODO: wire actual audio preview
+    console.log("Preview", voiceName);
+  };
 
   return (
     <section className="space-y-5">
@@ -32,53 +45,57 @@ export function VoiceSection() {
         {mockVoices.map((v) => {
           const isSelected = selected === v.id;
           return (
-            <button
+            <div
               key={v.id}
-              type="button"
-              onClick={() => setSelected(v.id)}
-              aria-pressed={isSelected}
-              aria-label={`${v.name}, ${v.tag}`}
               className={cn(
-                "bg-[var(--card)] border-[1.5px] rounded-[20px] p-5 cursor-pointer transition-all flex flex-col gap-3.5 text-left",
+                "bg-[var(--card)] border-[1.5px] rounded-[20px] p-5 transition-all flex flex-col gap-3.5",
                 isSelected
                   ? "border-[var(--primary)] bg-[var(--accent)]"
                   : "border-[var(--border)] hover:border-[#b8d4f0]"
               )}
             >
-              <div className="flex justify-between items-start gap-2">
-                <div>
-                  <div className="text-xl font-semibold tracking-tight">{v.name}</div>
-                  <div className="text-[var(--muted-foreground)] text-[13px] mt-1">{v.desc}</div>
+              <button
+                type="button"
+                onClick={() => setSelected(v.id)}
+                aria-pressed={isSelected}
+                className="flex-1 text-left cursor-pointer"
+              >
+                <div className="flex justify-between items-start gap-2">
+                  <div>
+                    <div className="text-xl font-semibold tracking-tight">{v.name}</div>
+                    <div className="text-[var(--muted-foreground)] text-[13px] mt-1">{v.desc}</div>
+                  </div>
+                  {isSelected && (
+                    <span
+                      aria-hidden="true"
+                      className="w-6 h-6 rounded-full bg-[var(--primary)] text-white grid place-items-center shrink-0"
+                    >
+                      <Check size={14} strokeWidth={2.5} />
+                    </span>
+                  )}
                 </div>
-                {isSelected && (
-                  <span
-                    aria-hidden="true"
-                    className="w-6 h-6 rounded-full bg-[var(--primary)] text-white grid place-items-center shrink-0"
-                  >
-                    <Check size={14} strokeWidth={2.5} />
-                  </span>
-                )}
-              </div>
+              </button>
+
               <div className="flex items-center justify-between gap-2">
                 <span
                   className={cn(
-                    "text-xs px-2.5 py-1 rounded-full self-start",
+                    "text-xs px-2.5 py-1 rounded-full",
                     isSelected ? "bg-white" : "bg-[var(--muted)]",
                     "text-[var(--muted-foreground)]"
                   )}
                 >
                   {v.tag}
                 </span>
-                <span
-                  role="button"
+                <button
+                  type="button"
+                  onClick={() => handlePreview(v.name)}
                   aria-label={`Preview ${v.name}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-9 h-9 rounded-full bg-[var(--card)] border border-[var(--border)] grid place-items-center text-[var(--primary)] cursor-pointer"
+                  className="w-9 h-9 rounded-full bg-[var(--card)] border border-[var(--border)] grid place-items-center text-[var(--primary)] cursor-pointer hover:bg-[var(--muted)] transition-colors"
                 >
                   <Play size={14} fill="currentColor" />
-                </span>
+                </button>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
@@ -103,8 +120,16 @@ export function VoiceSection() {
         </Select>
       </Card>
 
-      <div className="flex justify-end">
-        <Button>Save preferences</Button>
+      <div className="flex justify-end items-center gap-4">
+        <div
+          ref={saveRef}
+          aria-live="polite"
+          aria-atomic="true"
+          className="text-[var(--secondary)] font-semibold text-sm"
+        >
+          {saved && "Preferences saved"}
+        </div>
+        <Button onClick={handleSave}>Save preferences</Button>
       </div>
     </section>
   );

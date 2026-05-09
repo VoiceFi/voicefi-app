@@ -10,8 +10,8 @@ export default function SettingsPage() {
       data-screen-label="Settings"
     >
       <header className="mb-8">
-        <h2 className="text-[30px] font-bold tracking-tight m-0">Settings</h2>
-        <p className="text-[var(--muted-foreground)] mt-1.5 text-[15px]">
+        <h2 className="text-[28px] font-bold tracking-tight m-0">Settings</h2>
+        <p className="text-[var(--muted-foreground)] mt-2 text-base leading-relaxed">
           Manage your voice preferences and security controls.
         </p>
       </header>
