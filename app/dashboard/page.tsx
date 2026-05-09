@@ -2,12 +2,18 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Check } from "lucide-react";
+import { useSignAndSendTransaction, useWallets } from "@privy-io/react-auth/solana";
 import { usePrivy } from "@privy-io/react-auth";
 import { useWallets } from "@privy-io/react-auth/solana";
 import { useConversation } from "@elevenlabs/react";
+import { Connection, PublicKey } from "@solana/web3.js";
+import bs58 from "bs58";
 import { MicOrb } from "@/components/voice/mic-orb";
 import { ConfirmationOverlay } from "@/components/voice/confirmation-overlay";
 import { mockTransactions } from "@/lib/mock-data";
+import { SOLANA_RPC_URL } from "@/lib/solana/constants";
+import { buildSolTransferTx, buildUsdcTransferTx } from "@/lib/solana/transfer";
+import { createClient } from "@/lib/supabase/client";
 import { truncateAddress } from "@/lib/utils";
 import type { VoiceState, DetectedIntent, IntentType } from "@/types/voice";
 
@@ -16,10 +22,49 @@ type PendingConfirmation = {
   resolve: (confirmed: boolean) => void;
 };
 
+function TokenChip({
+  symbol,
+  amount,
+  fractionDigits,
+}: {
+  symbol: string;
+  amount: number;
+  fractionDigits: number;
+}) {
+  return (
+    <div className="inline-flex items-center gap-2 bg-white/70 border border-[var(--border)] rounded-full pl-2.5 pr-3.5 py-1.5">
+      <span
+        aria-hidden="true"
+        className="w-6 h-6 rounded-full grid place-items-center text-white text-[10px] font-bold"
+        style={{ background: "linear-gradient(135deg, #4A90D9, #168060)" }}
+      >
+        {symbol[0]}
+      </span>
+      <span className="text-[13px] font-semibold tracking-tight">
+        {amount.toLocaleString("en-US", {
+          minimumFractionDigits: fractionDigits,
+          maximumFractionDigits: fractionDigits,
+        })}{" "}
+        <span className="text-[var(--muted-foreground)] font-medium">{symbol}</span>
+      </span>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { user } = usePrivy();
   const { wallets } = useWallets();
-  const walletAddress = wallets[0]?.address ?? "";
+  const wallet = wallets[0];
+  const walletAddress = wallet?.address ?? "";
+  const { signAndSendTransaction } = useSignAndSendTransaction();
+  const supabase = useMemo(() => createClient(), []);
+  const connection = useMemo(
+    () => new Connection(SOLANA_RPC_URL, "confirmed"),
+    [],
+  );
+
+  type Balance = { sol: number; usdc: number; totalUsd: number };
+  const [balance, setBalance] = useState<Balance | null>(null);
 
   const userName = useMemo(() => {
     const email = user?.email?.address;
@@ -29,17 +74,21 @@ export default function DashboardPage() {
     return first ? first.charAt(0).toUpperCase() + first.slice(1) : "there";
   }, [user?.email?.address]);
 
-  const [balance, setBalance] = useState<number | null>(null);
   const [balanceLoading, setBalanceLoading] = useState(true);
+  const [lastSignature, setLastSignature] = useState<string | null>(null);
 
   const fetchBalance = useCallback(async () => {
     if (!walletAddress) return;
     try {
       const res = await fetch(`/api/balance?walletAddress=${walletAddress}`);
       const data = await res.json();
-      setBalance(data.totalUsd ?? 0);
+      setBalance({
+        sol: data.sol ?? 0,
+        usdc: data.usdc ?? 0,
+        totalUsd: data.totalUsd ?? 0,
+      });
     } catch {
-      setBalance(0);
+      setBalance({ sol: 0, usdc: 0, totalUsd: 0 });
     } finally {
       setBalanceLoading(false);
     }
@@ -72,6 +121,7 @@ export default function DashboardPage() {
   const conversation = useConversation({
     clientTools: {
       detectIntent: async (params) => {
+        console.log("[voice] detectIntent called", params);
         const intent: DetectedIntent = {
           intent: params.intent as IntentType,
           amount: typeof params.amount === "number" ? params.amount : undefined,
@@ -79,30 +129,112 @@ export default function DashboardPage() {
           recipient: typeof params.recipient === "string" ? params.recipient : undefined,
           timestamp: Date.now(),
         };
+
+        if (intent.intent === "send" && intent.recipient && walletAddress) {
+          const { data } = await supabase
+            .from("contacts")
+            .select("address, name")
+            .eq("wallet_address", walletAddress)
+            .ilike("name", intent.recipient)
+            .limit(1)
+            .maybeSingle();
+          if (data?.address) {
+            intent.recipientAddress = data.address;
+            intent.recipient = data.name;
+          } else {
+            intent.unresolved = true;
+          }
+        }
+
         setCurrentIntent(intent);
-        return JSON.stringify({ acknowledged: true });
+        const response = {
+          acknowledged: true,
+          recipientResolved: !!intent.recipientAddress,
+          recipientUnresolved: !!intent.unresolved,
+        };
+        console.log("[voice] detectIntent response →", response, "intent:", intent);
+        return JSON.stringify(response);
       },
       requestConfirmation: async (params) => {
+        console.log("[voice] requestConfirmation called", params);
         const summary = typeof params.summary === "string" ? params.summary : "";
         const confirmed = await new Promise<boolean>((resolve) => {
           setPendingConfirmation({ summary, resolve });
         });
+        console.log("[voice] requestConfirmation resolved →", { confirmed });
         return JSON.stringify({ confirmed });
       },
-      executeMockTransaction: async () => {
-        await new Promise((r) => setTimeout(r, 800));
-        setShowSuccess(true);
-        if (successTimerRef.current) clearTimeout(successTimerRef.current);
-        successTimerRef.current = setTimeout(() => setShowSuccess(false), 2800);
+      executeTransaction: async () => {
+        console.log("[voice] executeTransaction called");
         const intent = currentIntentRef.current;
-        return JSON.stringify({
-          success: true,
-          mockHash: "5xY...mock...abc",
-          intent: intent?.intent ?? null,
-        });
+        if (!intent || intent.intent !== "send") {
+          return JSON.stringify({ success: false, error: "No send intent active." });
+        }
+        if (!intent.recipientAddress) {
+          return JSON.stringify({ success: false, error: "Recipient not resolved." });
+        }
+        if (!intent.amount || intent.amount <= 0) {
+          return JSON.stringify({ success: false, error: "Amount must be greater than zero." });
+        }
+        if (!wallet) {
+          return JSON.stringify({ success: false, error: "Wallet not connected." });
+        }
+
+        const tokenSymbol = (intent.token ?? "USDC").trim().toUpperCase();
+        if (tokenSymbol !== "SOL" && tokenSymbol !== "USDC") {
+          return JSON.stringify({
+            success: false,
+            error: `Unsupported token "${tokenSymbol}". Only SOL and USDC are supported.`,
+          });
+        }
+
+        try {
+          const senderPk = new PublicKey(wallet.address);
+          const recipientPk = new PublicKey(intent.recipientAddress);
+          const txBytes =
+            tokenSymbol === "SOL"
+              ? await buildSolTransferTx({
+                  connection,
+                  sender: senderPk,
+                  recipient: recipientPk,
+                  amountSol: intent.amount,
+                })
+              : await buildUsdcTransferTx({
+                  connection,
+                  sender: senderPk,
+                  recipient: recipientPk,
+                  amountUsdc: intent.amount,
+                });
+
+          const { signature } = await signAndSendTransaction({
+            transaction: txBytes,
+            wallet,
+            chain: "solana:devnet",
+          });
+
+          const sigB58 = bs58.encode(signature);
+          await connection.confirmTransaction(sigB58, "confirmed");
+
+          setLastSignature(sigB58);
+          setShowSuccess(true);
+          if (successTimerRef.current) clearTimeout(successTimerRef.current);
+          successTimerRef.current = setTimeout(() => setShowSuccess(false), 6000);
+          fetchBalance();
+
+          return JSON.stringify({
+            success: true,
+            signature: sigB58,
+            explorerUrl: `https://explorer.solana.com/tx/${sigB58}?cluster=devnet`,
+          });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Unknown error";
+          console.error("executeTransaction failed:", err);
+          return JSON.stringify({ success: false, error: message });
+        }
       },
     },
     onMessage: ({ message, source }) => {
+      console.log(`[voice] message from ${source}:`, message);
       if (source === "user") {
         setUserTranscript(message);
       } else {
@@ -110,7 +242,13 @@ export default function DashboardPage() {
       }
     },
     onError: (message) => {
-      console.error("ElevenLabs error:", message);
+      console.error("[voice] ElevenLabs error:", message);
+    },
+    onConnect: () => {
+      console.log("[voice] connected to agent");
+    },
+    onDisconnect: () => {
+      console.log("[voice] disconnected from agent");
     },
   });
 
@@ -175,12 +313,18 @@ export default function DashboardPage() {
         amount: intent.amount ?? 0,
         recipient: intent.token ? `${intent.token} swap` : "swap",
         note: pendingConfirmation.summary,
+        token: "USDC",
       };
     }
+    const displayName = intent?.recipient ?? "your wallet";
+    const recipient = intent?.recipientAddress
+      ? `${displayName} (${truncateAddress(intent.recipientAddress)})`
+      : displayName;
     return {
       amount: intent?.amount ?? 0,
-      recipient: intent?.recipient ?? "your wallet",
+      recipient,
       note: undefined,
+      token: (intent?.token ?? "USDC").trim().toUpperCase(),
     };
   }, [pendingConfirmation, currentIntent]);
 
@@ -190,8 +334,9 @@ export default function DashboardPage() {
       return `Swap confirmed`;
     }
     const amt = currentIntent.amount ?? 0;
+    const token = (currentIntent.token ?? "USDC").trim().toUpperCase();
     const who = currentIntent.recipient ?? "your wallet";
-    return `$${amt} sent to ${who}`;
+    return `${amt} ${token} sent to ${who}`;
   }, [currentIntent]);
 
   const status = {
@@ -217,12 +362,18 @@ export default function DashboardPage() {
           {balanceLoading ? (
             <span className="text-[var(--muted-foreground)] opacity-40">$···</span>
           ) : (
-            `$${(balance ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+            `$${(balance?.totalUsd ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
           )}
         </div>
         {walletAddress && (
           <div className="mono text-xs text-[var(--muted-foreground)] mt-2">
             {truncateAddress(walletAddress)}
+          </div>
+        )}
+        {!balanceLoading && balance && (
+          <div className="mt-4 pt-4 border-t border-[var(--border)] flex flex-wrap gap-2.5">
+            <TokenChip symbol="SOL" amount={balance.sol} fractionDigits={4} />
+            <TokenChip symbol="USDC" amount={balance.usdc} fractionDigits={2} />
           </div>
         )}
       </section>
@@ -324,6 +475,7 @@ export default function DashboardPage() {
           amount={overlayProps.amount}
           recipient={overlayProps.recipient}
           note={overlayProps.note}
+          token={overlayProps.token}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />
@@ -336,6 +488,16 @@ export default function DashboardPage() {
           style={{ zIndex: 80 }}
         >
           <Check size={18} strokeWidth={2.5} /> {successMessage}
+          {lastSignature && (
+            <a
+              href={`https://explorer.solana.com/tx/${lastSignature}?cluster=devnet`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline ml-1"
+            >
+              View on explorer
+            </a>
+          )}
         </div>
       )}
     </div>

@@ -13,5 +13,7 @@ export interface DetectedIntent {
   amount?: number;
   token?: string;
   recipient?: string;
+  recipientAddress?: string;
+  unresolved?: boolean;
   timestamp: number;
 }
