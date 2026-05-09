@@ -214,8 +214,8 @@ export default function ContactsPage() {
             >
               <div
                 aria-hidden="true"
-                className="w-[46px] h-[46px] rounded-full grid place-items-center text-white font-semibold shrink-0"
-                style={{ background: "linear-gradient(135deg, #4A90D9, #168060)" }}
+                className="w-[46px] h-[46px] rounded-full grid place-items-center text-[var(--primary-foreground)] font-semibold shrink-0"
+                style={{ background: "var(--avatar-gradient)" }}
               >
                 {c.name[0]?.toUpperCase() ?? "?"}
               </div>

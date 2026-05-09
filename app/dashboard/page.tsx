@@ -196,8 +196,7 @@ export default function DashboardPage() {
       {/* Balance */}
       <section
         aria-label="Account balance"
-        className="rounded-[26px] border border-[var(--border)] py-7 px-8"
-        style={{ background: "linear-gradient(135deg, #EDF4FC 0%, #ffffff 100%)" }}
+        className="rounded-[26px] border border-[var(--border)] py-7 px-8 bg-[var(--card)]"
       >
         <div className="text-[var(--muted-foreground)] text-sm font-medium">Your balance</div>
         <div
@@ -322,7 +321,7 @@ export default function DashboardPage() {
       {showSuccess && !pendingConfirmation && (
         <div
           role="status"
-          className="fixed bottom-[88px] left-1/2 -translate-x-1/2 bg-[var(--secondary)] text-white py-3 px-5 rounded-full font-semibold text-[15px] flex items-center gap-2.5 shadow-[0_12px_32px_rgba(22,128,96,0.3)] animate-fade-in-up"
+          className="fixed bottom-[88px] left-1/2 -translate-x-1/2 bg-[var(--secondary)] text-[var(--primary-foreground)] py-3 px-5 rounded-full font-semibold text-[15px] flex items-center gap-2.5 shadow-[0_12px_32px_rgba(22,128,96,0.3)] animate-fade-in-up"
           style={{ zIndex: 80 }}
         >
           <Check size={18} strokeWidth={2.5} /> {successMessage}

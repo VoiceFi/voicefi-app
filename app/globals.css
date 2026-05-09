@@ -49,6 +49,7 @@
   --nav-scrolled-bg: rgba(248,247,244,0.95);
   --mic-idle-from: #ffffff;
   --mic-idle-to: #f6f5f2;
+  --avatar-gradient: linear-gradient(135deg, #4A90D9, #168060);
 }
 
 .dark {
@@ -78,6 +79,7 @@
   --nav-scrolled-bg: rgba(15,17,21,0.95);
   --mic-idle-from: #252830;
   --mic-idle-to: #1c1e26;
+  --avatar-gradient: linear-gradient(135deg, #4A90D9, #168060);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -164,7 +166,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 .mic-button:active { transform: scale(0.96); }
 
 .wave-bars { display: flex; gap: 5px; align-items: center; height: 38px; }
-.wave-bars span { display: block; width: 5px; background: white; border-radius: 6px;
+.wave-bars span { display: block; width: 5px; background: var(--primary-foreground); border-radius: 6px;
   height: 100%; transform-origin: center; }
 
 /* ---------- Confirmation overlay ---------- */

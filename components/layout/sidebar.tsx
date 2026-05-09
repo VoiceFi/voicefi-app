@@ -65,8 +65,8 @@ export function Sidebar() {
         <div className="p-4 flex gap-3 items-center">
           <span
             aria-hidden="true"
-            className="w-[38px] h-[38px] rounded-full grid place-items-center text-white font-semibold text-sm shrink-0"
-            style={{ background: "linear-gradient(135deg, #4A90D9, #168060)" }}
+            className="w-[38px] h-[38px] rounded-full grid place-items-center text-[var(--primary-foreground)] font-semibold text-sm shrink-0"
+            style={{ background: "var(--avatar-gradient)" }}
           >
             {initials}
           </span>
