@@ -18,7 +18,7 @@ export default function LandingPage() {
       <section id="main-content" className="hero-bg pt-20 pb-6 text-center">
         <div className="max-w-[1120px] mx-auto px-5 md:px-8">
           {/* Badge */}
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--primary)]/20 bg-[var(--accent)] text-[var(--primary)] text-[12px] font-semibold uppercase tracking-[0.08em]">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--primary)]/30 bg-[var(--accent)] text-[var(--primary)] text-[12px] font-semibold uppercase tracking-[0.08em]">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-[pulse-soft_2.5s_ease-in-out_infinite]" />
             Voice-first payments · Solana
           </span>
@@ -50,6 +50,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features — Bento Grid */}
+      <div className="bg-[var(--surface-sunken)]">
       <section className="max-w-[1120px] mx-auto px-5 md:px-8 py-12 md:py-16">
         <Reveal>
           {/* Section header */}
@@ -92,7 +93,7 @@ export default function LandingPage() {
               <div>
                 <div
                   aria-hidden="true"
-                  className="w-14 h-14 rounded-2xl bg-[rgba(22,128,96,0.10)] text-[var(--secondary)] grid place-items-center mb-7"
+                  className="w-14 h-14 rounded-2xl bg-[rgba(22,128,96,0.14)] text-[var(--secondary)] grid place-items-center mb-7"
                 >
                   <Mic size={28} strokeWidth={1.5} />
                 </div>
@@ -139,6 +140,7 @@ export default function LandingPage() {
           </div>
         </Reveal>
       </section>
+      </div>
 
       {/* How it works */}
       <section
@@ -194,7 +196,7 @@ export default function LandingPage() {
             ].map((s) => (
               <Reveal key={s.n} delay={s.delay}>
                 <div className="flex flex-col items-center md:items-start gap-5 text-center md:text-left">
-                  <div className="w-14 h-14 rounded-full border-2 border-[var(--primary)]/20 bg-white grid place-items-center flex-shrink-0">
+                  <div className="w-14 h-14 rounded-full border-2 border-[var(--primary)]/30 bg-[var(--accent)] grid place-items-center flex-shrink-0">
                     <div className="w-8 h-8 rounded-full bg-[var(--primary)] text-white grid place-items-center font-bold text-sm">
                       {s.n}
                     </div>
