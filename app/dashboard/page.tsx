@@ -31,7 +31,7 @@ function TokenChip({
   fractionDigits: number;
 }) {
   return (
-    <div className="inline-flex items-center gap-2 bg-white/70 border border-[var(--border)] rounded-full pl-2.5 pr-3.5 py-1.5">
+    <div className="inline-flex items-center gap-2 bg-[var(--surface-raised)] border border-[var(--border)] rounded-full pl-2.5 pr-3.5 py-1.5">
       <span
         aria-hidden="true"
         className="w-6 h-6 rounded-full grid place-items-center text-white text-[10px] font-bold"
@@ -351,7 +351,7 @@ export default function DashboardPage() {
       <section
         aria-label="Account balance"
         className="rounded-[26px] border border-[var(--border)] py-7 px-8"
-        style={{ background: "linear-gradient(135deg, #EDF4FC 0%, #ffffff 100%)" }}
+        style={{ background: "linear-gradient(135deg, var(--accent) 0%, var(--card) 100%)" }}
       >
         <div className="text-[var(--muted-foreground)] text-sm font-medium">Your balance</div>
         <div
