@@ -1,24 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #F8F7F4;
-  --color-foreground: #1A1A1A;
-  --color-card: #FFFFFF;
-  --color-primary: #2F7DE1;
-  --color-primary-foreground: #FFFFFF;
-  --color-secondary: #168060;
-  --color-secondary-foreground: #1A1A1A;
-  --color-muted: #F0EFEC;
-  --color-muted-foreground: #6B6B6B;
-  --color-accent: #EDF4FC;
-  --color-destructive: #E53935;
-  --color-border: #E5E4E1;
-  --color-input: #F5F4F1;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
   --radius: 1rem;
 
   --font-sans: "Inter", "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
   --font-display: var(--font-calistoga), "Georgia", ui-serif, serif;
+  --font-brand: var(--font-space-grotesk), "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -32,19 +33,53 @@
   --secondary: #168060;
   --secondary-foreground: #1A1A1A;
   --success: #168060;
-  --muted: #F0EFEC;
-  --muted-foreground: #6B6B6B;
-  --accent: #EDF4FC;
+  --muted: #E7E6E2;
+  --muted-foreground: #5A5A5A;
+  --accent: #E0EAFA;
   --destructive: #E53935;
-  --border: #E5E4E1;
-  --border-subtle: rgba(229,228,225,0.5);
-  --border-strong: #D5D4D1;
-  --input: #F5F4F1;
+  --border: #D4D3CF;
+  --border-subtle: rgba(195,193,189,0.65);
+  --border-strong: #BDBCBB;
+  --input: #F0EFEC;
   --surface-raised: #FFFFFF;
-  --surface-sunken: #F2F1EE;
-  --surface-overlay: rgba(248,247,244,0.82);
-  --foreground-secondary: #4A4A4A;
-  --foreground-tertiary: #7A7A7A;
+  --surface-sunken: #ECEAE6;
+  --surface-overlay: rgba(248,247,244,0.88);
+  --foreground-secondary: #3A3A3A;
+  --foreground-tertiary: #6A6A6A;
+  --nav-scrolled-bg: rgba(248, 247, 244, 0.97);
+    --mic-idle-from: #ffffff;
+    --mic-idle-to: #f0efec;
+    --avatar-gradient: linear-gradient(135deg, #4A90D9, #168060);
+}
+
+.dark {
+  --background: #0F1115;
+  --foreground: #F0F0F0;
+  --card: #181A20;
+  --primary: #4A90D9;
+  --primary-foreground: #FFFFFF;
+  --primary-hover: #5FA0E6;
+  --primary-glow: rgba(74, 144, 217, 0.25);
+  --secondary: #2ECC81;
+  --secondary-foreground: #F0F0F0;
+  --success: #2ECC81;
+  --muted: #1E2028;
+  --muted-foreground: #9CA3AF;
+  --accent: #1A2332;
+  --destructive: #FF5A52;
+  --border: #2A2D36;
+  --border-subtle: rgba(42, 45, 54, 0.5);
+  --border-strong: #3A3D48;
+  --input: #1E2028;
+  --surface-raised: #1E2028;
+  --surface-sunken: #0F1115;
+  --surface-overlay: rgba(15, 17, 21, 0.82);
+  --foreground-secondary: #D1D5DB;
+  --foreground-tertiary: #9CA3AF;
+  --nav-scrolled-bg: rgba(15, 17, 21, 0.95);
+  --mic-idle-from: #252830;
+  --mic-idle-to: #1c1e26;
+  --avatar-gradient: linear-gradient(135deg, #4A90D9, #168060);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -56,6 +91,7 @@ html, body {
   font-size: 17px; line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 button { font-family: inherit; }
@@ -64,6 +100,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 }
 .mono { font-family: var(--font-mono); }
 .font-display { font-family: var(--font-display); }
+.font-brand { font-family: var(--font-brand); }
 
 /* ---------- Animations ---------- */
 @keyframes pulse-soft {
@@ -116,7 +153,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 .mic-orb-bg { position: absolute; width: 170px; height: 170px; border-radius: 999px;
   background: radial-gradient(circle at 30% 30%, #6fb0ff 0%, #4A90D9 45%, #2c6fbf 100%);
   animation: orb-float 6s ease-in-out infinite; pointer-events: none; }
-.mic-orb-bg.idle { background: linear-gradient(140deg, #ffffff 0%, #f6f5f2 100%);
+.mic-orb-bg.idle { background: linear-gradient(140deg, var(--mic-idle-from) 0%, var(--mic-idle-to) 100%);
   border: 1px solid var(--border); animation: none; }
 .mic-orb-bg.speaking { background: radial-gradient(circle at 30% 30%, #4ad4a8 0%, #168060 45%, #0d5c42 100%); }
 
@@ -129,7 +166,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 .mic-button:active { transform: scale(0.96); }
 
 .wave-bars { display: flex; gap: 5px; align-items: center; height: 38px; }
-.wave-bars span { display: block; width: 5px; background: white; border-radius: 6px;
+.wave-bars span { display: block; width: 5px; background: var(--primary-foreground); border-radius: 6px;
   height: 100%; transform-origin: center; }
 
 /* ---------- Confirmation overlay ---------- */
@@ -141,12 +178,28 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 /* ---------- Hero ---------- */
 .hero-bg {
   background:
-    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(47,125,225,0.06) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(22,128,96,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(47, 125, 225, 0.11) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(22, 128, 96, 0.07) 0%, transparent 60%),
     var(--background);
 }
 .animate-hero-orb {
   animation: orb-float 8s ease-in-out infinite, orb-glow-pulse 4s ease-in-out infinite;
+}
+
+/* Dot-grid decoration — visible in upper hero area, fades toward the orb */
+.hero-dot-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(47, 125, 225, 0.28) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 15%, black 35%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 15%, black 35%, transparent 85%);
+}
+
+.dark .hero-dot-grid {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
 }
 
 @keyframes orb-glow-pulse {
@@ -163,7 +216,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 .nav-header.scrolled {
-  background: rgba(248,247,244,0.95);
+  background: var(--nav-scrolled-bg);
   border-color: var(--border-strong);
 }
 
@@ -187,7 +240,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   background:
     radial-gradient(ellipse 100% 100% at 20% 50%, rgba(47,125,225,0.12) 0%, transparent 60%),
     radial-gradient(ellipse 80% 80% at 80% 50%, rgba(22,128,96,0.08) 0%, transparent 60%),
-    #FFFFFF;
+    var(--card);
   border: 1px solid var(--border);
   border-radius: 32px;
   overflow: hidden;
