@@ -15,8 +15,9 @@ export default function LandingPage() {
       <StickyHeader />
 
       {/* Hero */}
-      <section id="main-content" className="hero-bg pt-20 pb-6 text-center">
-        <div className="max-w-[1120px] mx-auto px-5 md:px-8">
+      <section id="main-content" className="hero-bg relative pt-20 pb-6 text-center">
+        <div aria-hidden="true" className="hero-dot-grid" />
+        <div className="relative z-10 max-w-[1120px] mx-auto px-5 md:px-8">
           {/* Badge */}
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--primary)]/30 bg-[var(--accent)] text-[var(--primary)] text-[12px] font-semibold uppercase tracking-[0.08em]">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-[pulse-soft_2.5s_ease-in-out_infinite]" />
