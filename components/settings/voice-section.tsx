@@ -80,7 +80,7 @@ export function VoiceSection() {
                 <span
                   className={cn(
                     "text-xs px-2.5 py-1 rounded-full",
-                    isSelected ? "bg-white" : "bg-[var(--muted)]",
+                    isSelected ? "bg-[var(--card)]" : "bg-[var(--muted)]",
                     "text-[var(--muted-foreground)]"
                   )}
                 >

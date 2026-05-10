@@ -8,6 +8,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Topbar } from "@/components/layout/topbar";
 import { TopbarUserMenu } from "@/components/layout/topbar-user-menu";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { SkipLink } from "@/components/ui/skip-link";
 
 function getInitials(email: string | null | undefined): string {
@@ -60,7 +61,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <div className="flex-1 min-w-0 flex flex-col">
         <Topbar
           title={pageTitle}
-          right={<TopbarUserMenu initials={initials} email={userEmail} />}
+          right={
+            <>
+              <ThemeToggle />
+              <TopbarUserMenu initials={initials} email={userEmail} />
+            </>
+          }
         />
         <main id="main-content" className="flex-1">{children}</main>
         <BottomNav />
