@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Check } from "lucide-react";
 import { useSignAndSendTransaction, useWallets } from "@privy-io/react-auth/solana";
 import { usePrivy } from "@privy-io/react-auth";
-import { useWallets } from "@privy-io/react-auth/solana";
 import { useConversation } from "@elevenlabs/react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import bs58 from "bs58";
