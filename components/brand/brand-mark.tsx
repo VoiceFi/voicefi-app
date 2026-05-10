@@ -1,14 +1,18 @@
-import { Mic } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { VoicefiLogo } from "./voicefi-logo";
 
-export function BrandMark({ size = 38, className }: { size?: number; className?: string }) {
+export function BrandMark({ size = 40, className }: { size?: number; className?: string }) {
+  const logoSize = Math.round(size * 0.8);
   return (
     <span
       aria-hidden="true"
-      className={cn("grid place-items-center bg-[var(--primary)] text-white", className)}
-      style={{ width: size, height: size, borderRadius: size / 3 }}
+      className={cn(
+        "inline-flex items-center justify-center shrink-0",
+        className
+      )}
+      style={{ width: size, height: size }}
     >
-      <Mic size={size * 0.5} strokeWidth={2} />
+      <VoicefiLogo size={logoSize} />
     </span>
   );
 }

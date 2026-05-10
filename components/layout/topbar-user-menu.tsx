@@ -37,8 +37,8 @@ export function TopbarUserMenu({ initials, email }: TopbarUserMenuProps) {
       {/* Desktop: static avatar (no interactive menu) */}
       <span
         aria-hidden="true"
-        className="hidden md:grid w-[38px] h-[38px] rounded-full place-items-center text-white font-semibold text-sm"
-        style={{ background: "linear-gradient(135deg, #4A90D9, #168060)" }}
+        className="hidden md:grid w-[38px] h-[38px] rounded-full place-items-center text-[var(--primary-foreground)] font-semibold text-sm"
+              style={{ background: "var(--avatar-gradient)" }}
       >
         {initials}
       </span>
@@ -50,8 +50,8 @@ export function TopbarUserMenu({ initials, email }: TopbarUserMenuProps) {
             <button
               type="button"
               aria-label={`Open user menu for ${email ?? "user"}`}
-              className="w-[38px] h-[38px] rounded-full grid place-items-center text-white font-semibold text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2"
-              style={{ background: "linear-gradient(135deg, #4A90D9, #168060)" }}
+              className="w-[38px] h-[38px] rounded-full grid place-items-center text-[var(--primary-foreground)] font-semibold text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2"
+        style={{ background: "var(--avatar-gradient)" }}
             >
               {initials}
             </button>
